@@ -26,6 +26,12 @@ int main(int argc, char *argv[])
 		arr[i] = rand() % N;
 	}
 	
+	int j = 0;
+	for (int i = 0; i < N; i++)
+	{
+		j = arr[j];
+	}
+	
 	uint64_t elapsed_time = getTicks(c1) - current_time;
 
 	printf("Time in Ticks to calculate sum of integers from 0 to 10000 (exclusive): %lu\n", elapsed_time);
