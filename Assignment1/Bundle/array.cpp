@@ -10,9 +10,6 @@ int main(int argc, char *argv[])
 	c1.init = false;
 	initTicks(c1);
 
-	//timer for sum
-	uint64_t current_time = getTicks(c1);
-
 	//seed rand gen with time
 	srand(time(NULL));
 
@@ -21,13 +18,27 @@ int main(int argc, char *argv[])
 
 	int arr[N];
 
-	for (int i = 0; i < N; i++)
+	for(int i = 0; i < N; i++)
 	{
-		arr[i] = rand() % N;
+		arr[i] = i;
+	}
+
+	//randomize using fisher-yates shuffle
+	for(int i = 0; i < N; i++)
+	{
+		int temp = arr[i]
+		int rand_index = rand() % N + i
+
+		arr[i] = arr[rand_index];
+		arr[rand_index] = temp;
 	}
 	
+	//timer for chase
+	uint64_t current_time = getTicks(c1);
+
+	//pointer chasing
 	int j = 0;
-	for (int i = 0; i < N; i++)
+	for(int i = 0; i < N; i++)
 	{
 		j = arr[j];
 	}
