@@ -10,20 +10,20 @@ int main(int argc, char *argv[])
 	c1.init = false;
 	initTicks(c1);
 
-	//timer for sum
-	uint64_t current_time = getTicks(c1);
-
 	//Get the number of the user
 	int n = atoi(argv[1]);
+
+	//start timer 
+	uint64_t current_time = getTicks(c1);
 
 	//Compute sum
 	long long sum = 0;
 	for (long long i = 0; i < n; i++)
 	{
-		sum += 1;
+		sum += i;
 	}
 
-	printf("Total sum is: %llu\n", sum);
+//	printf("Total sum is: %llu\n", sum);
 	
 	uint64_t elapsed_time = getTicks(c1) - current_time;
 
