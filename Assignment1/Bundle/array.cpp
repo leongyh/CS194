@@ -14,23 +14,27 @@ int main(int argc, char *argv[])
 	srand(time(NULL));
 
 	//Get the number of the user
-	int N = atoi(argv[1]);
+	int N = atoi(argv[1]) * 1024 / 4;
 
-	int arr[N];
-
+	int *arr;
+	arr = (int*) calloc(N, sizeof(int));
+	
 	for(int i = 0; i < N; i++)
 	{
 		arr[i] = i;
 	}
 
-	//randomize using fisher-yates shuffle
-	for(int i = 0; i < N; i++)
-	{
-		int temp = arr[i]
-		int rand_index = rand() % N + i
+	int temp, rand_index;
 
-		arr[i] = arr[rand_index];
-		arr[rand_index] = temp;
+	//randomize using fisher-yates shuffle
+	for(int i = N-1; i > 0; i--)
+	{
+//		std::swap(arr[i], arr[rand()%(i+1));
+		rand_index = rand() % (i+1);
+		temp = arr[rand_index];
+
+		arr[rand_index] = arr[i];
+		arr[i] = temp;
 	}
 	
 	//timer for chase
@@ -45,5 +49,5 @@ int main(int argc, char *argv[])
 	
 	uint64_t elapsed_time = getTicks(c1) - current_time;
 
-	printf("Time in Ticks to calculate sum of integers from 0 to 10000 (exclusive): %lu\n", elapsed_time);
+	printf("Time in Ticks to chase an array of size %u: %lu\n", N, elapsed_time);
 }
