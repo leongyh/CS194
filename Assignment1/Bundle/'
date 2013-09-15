@@ -21,12 +21,12 @@ int main(int argc, char *argv[])
 	int size = atoi(argv[1]) * 1024 / 4;
 
 	//warmup cache
-	cacheWarmup(size, 100);
-//	int* source_array;
+//	cacheWarmup(size, 1000);
+	int* source_array;
 	double time_start, time_taken;
 
 	//naive copy
-	int source_array[size];
+	source_array = (int*) malloc(size*sizeof(int));
 	int iter = 0;
 	for (int i = 0; i < size; ++i)
 	{
@@ -34,16 +34,14 @@ int main(int argc, char *argv[])
 		iter = i;
 	}
 
-	printf("Source size len %u\nIterated: %u\nSource size bytes: %lu\n", source_array[size-1], iter, sizeof(source_array));
+	printf("Source size len %u\nIterated: %u\nSource size bytes: %lu\n", size, iter, sizeof(&source_array));
 
-	int naive_array[size];
+	int* naive_array = (int*) malloc(sizeof((int*)source_array));
 
 	gettimeofday(&tv, 0);
 	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
-	for(int i=0; i < size; ++i){
-		naive_array[i] = source_array[i];
-	}
-//	memcpy(naive_array, source_array, sizeof(source_array));
+
+	memcpy(naive_array, source_array, sizeof(source_array));
 
 	gettimeofday(&tv, 0);
 	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
@@ -55,12 +53,12 @@ int main(int argc, char *argv[])
 	{
 		source_array[i] = i;
 	}
-	int simd_array[size];
+	int* simd_array = (int*) malloc(sizeof(source_array));
 
 	gettimeofday(&tv, 0);
 	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
 
-	simd_memcpy(simd_array, source_array, sizeof(source_array));
+	simd_memcpy(&simd_array, &source_array, sizeof(source_array));
 
 	gettimeofday(&tv, 0);
 	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
@@ -72,12 +70,12 @@ int main(int argc, char *argv[])
 	{
 		source_array[i] = i;
 	}
-	int simd_cache_array[size];
+	int* simd_cache_array = (int*) malloc(sizeof(source_array));
 
 	gettimeofday(&tv, 0);
 	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
 
-	simd_memcpy_cache(simd_cache_array, source_array, sizeof(source_array));
+	simd_memcpy_cache(&simd_cache_array, &source_array, sizeof(source_array));
 
 	gettimeofday(&tv, 0);
 	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
@@ -121,7 +119,7 @@ int main(int argc, char *argv[])
 void cacheWarmup(int size, int iter)
 {
 	//create and populate array (32-bit, 4 byte slots)
-	int arr[size];
+	int* arr = (int*) malloc(size * sizeof(int));
 
 	for (int i = 0; i < size; ++i)
 	{
@@ -133,7 +131,7 @@ void cacheWarmup(int size, int iter)
 
 	for (int i = 0; i < warmup_count; ++i)
 	{
-		int temp_arr[size];
+		int* temp_arr = (int*) malloc(sizeof(arr));
 		memcpy(temp_arr, arr, sizeof(arr));
 	}
 }
