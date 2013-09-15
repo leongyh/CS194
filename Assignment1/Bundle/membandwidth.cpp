@@ -40,13 +40,6 @@ int main(int argc, char *argv[])
 
 	printf("Time taken for naive copy: %f seconds.\n", time_taken);
 
-	for(int i=0; i<size; ++i){
-		if(source_array[i] != naive_array[i]){
-			printf("Mismatch at: %u. %u to %u", i, source_array[i], naive_array[i]);
-			exit(EXIT_FAILURE);
-		}
-	}
-
 	//simd_memcpy
 	for (int i = 0; i < size; ++i)
 	{
@@ -57,7 +50,7 @@ int main(int argc, char *argv[])
 	gettimeofday(&tv, 0);
 	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
 
-	simd_memcpy(simd_array, source_array, sizeof(source_array));
+	simd_memcpy(&simd_array, &source_array, sizeof(source_array));
 
 	gettimeofday(&tv, 0);
 	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
@@ -74,12 +67,43 @@ int main(int argc, char *argv[])
 	gettimeofday(&tv, 0);
 	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
 
-	memcpy(simd_cache_array, source_array, sizeof(source_array));
+	simd_memcpy_cache(&simd_cache_array, &source_array, sizeof(source_array));
 
 	gettimeofday(&tv, 0);
 	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
 
 	printf("Time taken for simd cache copy: %f seconds.\n", time_taken);
+
+  //checking for correctness of copy and mutability
+  for(int i=0; i<size; ++i){
+    if(source_array[i] != naive_array[i]){
+      cout << "Failed naive_array copy.";
+      exit(EXIT_FAILURE);
+    }
+    if(source_array[i] != simd_array[i]){
+      cout << "Failed simd_array copy.";
+      exit(EXIT_FAILURE);
+    }
+    if(source_array[i] != simd_cache_array[i]){
+      cout << "Failed simd_cache_array copy.";
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  source_array[0] = 42;
+
+  if(source_array[0] == naive_array[0]){
+    cout << "Failed naive_array mutability.";
+    exit(EXIT_FAILURE);
+  }
+  if(source_array[0] == simd_array[0]){
+    cout << "Failed simd_array mutability.";
+    exit(EXIT_FAILURE);
+  }
+  if(source_array[0] == simd_cache_array[0]){
+    cout << "Failed simd_cache_array mutability.";
+    exit(EXIT_FAILURE);
+  }
 }
 
 void cacheWarmup(int size, int iter)
