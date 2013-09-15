@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	int size = atoi(argv[1]) * 1024 / 4;
 
 	//warmup cache
-	cacheWarmup(size, 100);
+//	cacheWarmup(size, 10);
 //	int* source_array;
 	double time_start, time_taken;
 
@@ -50,39 +50,39 @@ int main(int argc, char *argv[])
 
 	printf("Time taken for naive copy: %f seconds.\n", time_taken);
 
-	//simd_memcpy
-	for (int i = 0; i < size; ++i)
-	{
-		source_array[i] = i;
-	}
-	int simd_array[size];
+	// //simd_memcpy
+	// for (int i = 0; i < size; ++i)
+	// {
+	// 	source_array[i] = i;
+	// }
+	// int simd_array[size];
 
-	gettimeofday(&tv, 0);
-	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
+	// gettimeofday(&tv, 0);
+	// time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
 
-	simd_memcpy(simd_array, source_array, sizeof(source_array));
+	// simd_memcpy(simd_array, source_array, sizeof(source_array));
 
-	gettimeofday(&tv, 0);
-	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
+	// gettimeofday(&tv, 0);
+	// time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
 
-	printf("Time taken for simd copy: %f seconds.\n", time_taken);
+	// printf("Time taken for simd copy: %f seconds.\n", time_taken);
 
 	//simd_memcpy_cache
-	for (int i = 0; i < size; ++i)
-	{
-		source_array[i] = i;
-	}
-	int simd_cache_array[size];
+	// for (int i = 0; i < size; ++i)
+	// {
+	// 	source_array[i] = i;
+	// }
+	// int simd_cache_array[size];
 
-	gettimeofday(&tv, 0);
-	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
+	// gettimeofday(&tv, 0);
+	// time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
 
-	simd_memcpy_cache(simd_cache_array, source_array, sizeof(source_array));
+	// simd_memcpy_cache(simd_cache_array, source_array, sizeof(source_array));
 
-	gettimeofday(&tv, 0);
-	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
+	// gettimeofday(&tv, 0);
+	// time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
 
-	printf("Time taken for simd cache copy: %f seconds.\n", time_taken);
+	// printf("Time taken for simd cache copy: %f seconds.\n", time_taken);
 
   //checking for correctness of copy and mutability
   for(int i=0; i<size; ++i){
@@ -91,14 +91,14 @@ int main(int argc, char *argv[])
       std::cout << "Failed naive_array copy.";
       exit(EXIT_FAILURE);
     }
-    if(source_array[i] != simd_array[i]){
-      std::cout << "Failed simd_array copy.";
-      exit(EXIT_FAILURE);
-    }
-    if(source_array[i] != simd_cache_array[i]){
-      std::cout << "Failed simd_cache_array copy.";
-      exit(EXIT_FAILURE);
-    }
+    // if(source_array[i] != simd_array[i]){
+    //   std::cout << "Failed simd_array copy.";
+    //   exit(EXIT_FAILURE);
+    // }
+    // if(source_array[i] != simd_cache_array[i]){
+    //   std::cout << "Failed simd_cache_array copy.";
+    //   exit(EXIT_FAILURE);
+    // }
   }
 
   source_array[0] = 42;
@@ -108,14 +108,14 @@ int main(int argc, char *argv[])
     std::cout << "Failed naive_array mutability.";
     exit(EXIT_FAILURE);
   }
-  if(source_array[0] == simd_array[0]){
-    std::cout << "Failed simd_array mutability.";
-    exit(EXIT_FAILURE);
-  }
-  if(source_array[0] == simd_cache_array[0]){
-    std::cout << "Failed simd_cache_array mutability.";
-    exit(EXIT_FAILURE);
-  }
+  // if(source_array[0] == simd_array[0]){
+  //   std::cout << "Failed simd_array mutability.";
+  //   exit(EXIT_FAILURE);
+  // }
+  // if(source_array[0] == simd_cache_array[0]){
+  //   std::cout << "Failed simd_cache_array mutability.";
+  //   exit(EXIT_FAILURE);
+  // }
 }
 
 void cacheWarmup(int size, int iter)
