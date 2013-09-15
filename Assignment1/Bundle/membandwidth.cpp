@@ -33,12 +33,19 @@ int main(int argc, char *argv[])
 	gettimeofday(&tv, 0);
 	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
 
-	memcpy(naive_array, source_array, sizeof(source_array));
+	memcpy(&naive_array, &source_array, sizeof(source_array));
 
 	gettimeofday(&tv, 0);
 	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
 
 	printf("Time taken for naive copy: %f seconds.\n", time_taken);
+
+	for(int i=0; i<size; ++i){
+		if(source_array[i] != naive_array[i]){
+			printf("Mismatch at: %u. %u to %u", i, source_array[i], naive_array[i]);
+			exit(EXIT_FAILURE);
+		}
+	}
 
 	//simd_memcpy
 	for (int i = 0; i < size; ++i)
