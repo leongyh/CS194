@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
+#include <sys/time.h>
+#include <time.h>
 
 void simd_memcpy(void *dst, void *src, size_t nbytes)
 {
@@ -110,13 +112,35 @@ void simd_memcpy_cache(void *dst, void *src, size_t nbytes)
 
 int main(int argc, char *argv[])
 {
-  int myarray[10];
-  for(int i=0; i<10; i++)
+  int size = atoi(argv[1]) * 1024/4;
+  struct  timeval tv;
+  double timestart, timetaken;
+
+  int* myarray = new int[size];
+  for(int i=0; i<size; ++i)
     myarray[i] = i;
-  
-  int copiedarray[10];
-  simd_memcpy(copiedarray, myarray, 10*sizeof(int));
 
   for(int i=0; i<10; i++)
-    printf("copied[%d] = %d\n", i, copiedarray[i]);
+  {
+    int *tmp = new int[size];
+    memcpy(tmp, myarray, size*4);
+  }
+  
+  int* copiedarray = new int[size];
+
+  gettimeofday(&tv, 0);
+  timestart = tv.tv_sec + 1e-6*tv.tv_usec;
+  simd_memcpy_cache(copiedarray, myarray, size*sizeof(int));
+  gettimeofday(&tv, 0);
+  timetaken = (tv.tv_sec + 1e-6*tv.tv_usec)-timestart;
+
+  printf("time: %f\n", timetaken);
+
+  myarray[7] = 42;
+
+  if(myarray[7] == copiedarray[7])
+	exit(EXIT_FAILURE);
+
+//  for(int i=0; i<10; i++)
+//    printf("copied[%d] = %d\n", i, copiedarray[i]);
 }

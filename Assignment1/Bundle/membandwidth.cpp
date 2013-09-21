@@ -21,12 +21,12 @@ int main(int argc, char *argv[])
 	int size = atoi(argv[1]) * 1024 / 4;
 
 	//warmup cache
-//	cacheWarmup(size, 10);
+	cacheWarmup(size, 10);
 //	int* source_array;
 	double time_start, time_taken;
 
 	//naive copy
-	int source_array[size];
+	int* source_array = new int[size];
 	int iter = 0;
 	for (int i = 0; i < size; ++i)
 	{
@@ -36,36 +36,36 @@ int main(int argc, char *argv[])
 
 	printf("Source size len %u\nIterated: %u\nSource size bytes: %lu\n", source_array[size-1], iter, sizeof(source_array));
 
-	int naive_array[size];
+//	int* naive_array = new int[size];
 
-	gettimeofday(&tv, 0);
-	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
-	for(int i=0; i < size; ++i){
-		naive_array[i] = source_array[i];
-	}
+//	gettimeofday(&tv, 0);
+//	time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
+//	for(int i=0; i < size; ++i){
+//		naive_array[i] = source_array[i];
+//	}
 //	memcpy(naive_array, source_array, sizeof(source_array));
 
-	gettimeofday(&tv, 0);
-	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
+//	gettimeofday(&tv, 0);
+//	time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
 
-	printf("Time taken for naive copy: %f seconds.\n", time_taken);
+//	printf("Time taken for naive copy: %f seconds.\n", time_taken);
 
 	// //simd_memcpy
-	// for (int i = 0; i < size; ++i)
-	// {
-	// 	source_array[i] = i;
-	// }
-	// int simd_array[size];
+//	 for (int i = 0; i < size; ++i)
+//	 {
+//	 	source_array[i] = i;
+//	 }
+	 int* simd_array = new int[size];
 
-	// gettimeofday(&tv, 0);
-	// time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
+	 gettimeofday(&tv, 0);
+	 time_start = tv.tv_sec + 1e-6 * tv.tv_usec;
 
-	// simd_memcpy(simd_array, source_array, sizeof(source_array));
+	 simd_memcpy(simd_array, source_array, sizeof(size*4));
 
-	// gettimeofday(&tv, 0);
-	// time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
+	 gettimeofday(&tv, 0);
+	 time_taken = (tv.tv_sec + 1e-6 * tv.tv_usec) - time_start;
 
-	// printf("Time taken for simd copy: %f seconds.\n", time_taken);
+	 printf("Time taken for simd copy: %f seconds. item: %u\n", time_taken, simd_array[rand() % size]);
 
 	//simd_memcpy_cache
 	// for (int i = 0; i < size; ++i)
@@ -86,15 +86,15 @@ int main(int argc, char *argv[])
 
   //checking for correctness of copy and mutability
   for(int i=0; i<size; ++i){
-    if(source_array[i] != naive_array[i]){
-	printf("Failed at: %u", i);
-      std::cout << "Failed naive_array copy.";
-      exit(EXIT_FAILURE);
-    }
-    // if(source_array[i] != simd_array[i]){
-    //   std::cout << "Failed simd_array copy.";
-    //   exit(EXIT_FAILURE);
-    // }
+//    if(source_array[i] != naive_array[i]){
+//	printf("Failed at: %u", i);
+//      std::cout << "Failed naive_array copy.";
+//      exit(EXIT_FAILURE);
+//    }
+     if(source_array[i] != simd_array[i]){
+       std::cout << "Failed simd_array copy.";
+       exit(EXIT_FAILURE);
+     }
     // if(source_array[i] != simd_cache_array[i]){
     //   std::cout << "Failed simd_cache_array copy.";
     //   exit(EXIT_FAILURE);
@@ -103,15 +103,15 @@ int main(int argc, char *argv[])
 
   source_array[0] = 42;
 
-  if(source_array[0] == naive_array[0]){
-    printf("%u to %u", source_array[0], naive_array[0]);
-    std::cout << "Failed naive_array mutability.";
-    exit(EXIT_FAILURE);
-  }
-  // if(source_array[0] == simd_array[0]){
-  //   std::cout << "Failed simd_array mutability.";
-  //   exit(EXIT_FAILURE);
-  // }
+  //if(source_array[0] == naive_array[0]){
+    //printf("%u to %u", source_array[0], naive_array[0]);
+    //std::cout << "Failed naive_array mutability.";
+    //exit(EXIT_FAILURE);
+  //}
+   if(source_array[0] == simd_array[0]){
+     std::cout << "Failed simd_array mutability.";
+     exit(EXIT_FAILURE);
+   }
   // if(source_array[0] == simd_cache_array[0]){
   //   std::cout << "Failed simd_cache_array mutability.";
   //   exit(EXIT_FAILURE);
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 void cacheWarmup(int size, int iter)
 {
 	//create and populate array (32-bit, 4 byte slots)
-	int arr[size];
+	int*  arr = new int[size];
 
 	for (int i = 0; i < size; ++i)
 	{
@@ -133,10 +133,11 @@ void cacheWarmup(int size, int iter)
 
 	for (int i = 0; i < warmup_count; ++i)
 	{
-		int temp_arr[size];
-		memcpy(temp_arr, arr, sizeof(arr));
+		int* temp_arr = new int[size];
+		memcpy(temp_arr, arr, sizeof(size*4));
 	}
 }
+
 
 void simd_memcpy(void *dst, void *src, size_t nbytes)
 {
@@ -144,12 +145,12 @@ void simd_memcpy(void *dst, void *src, size_t nbytes)
 
   size_t ilen = nbytes/sizeof(int);
   size_t ilen_sm = ilen - ilen%16;
-
+  
   char *cdst=(char*)dst;
   char *csrc=(char*)src;
 
-  int * idst=(int*)dst;
-  int * isrc=(int*)src;
+  int * idst=(int*) dst;
+  int * isrc=(int*) src;
 
   __m128i l0,l1,l2,l3;
 
