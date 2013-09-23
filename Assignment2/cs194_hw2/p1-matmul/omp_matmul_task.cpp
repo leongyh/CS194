@@ -16,15 +16,18 @@ void omp_task_matmuld(double **a, double **b, double **c, int nthr)
 
   #pragma omp parallel
   {
-    for(int i=0;i<1024;i++)
-        {
+    #pragma omp single
+    {
+      for(int i=0;i<1024;i++)
+      {
           /* CS194: add pragmas to this loop-nest
            * to enable OpenMP task parallelism */
 
-          #pragma omp task shared (a,b,c)
-            do_mv(a,b,c,i);
+       #pragma omp task
+         do_mv(a,b,c,i);
           
-          }
+       }
+     }
   }
   
 }

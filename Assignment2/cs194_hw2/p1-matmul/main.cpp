@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
   printf("serial mflop/s = %f\n", report_mflops(serial_time));
   
   
-  /* omp for */
+  /* omp for */ 
   printf("Running OpenMP for:\n");
   for(int i = 1; i <= nprocs; i++)
     {
@@ -104,8 +104,8 @@ int main(int argc, char *argv[])
       printf("%d, %f\n", 
 	     i, report_mflops(omp_for_time));
     }
-
-  /* omp task */
+	
+  /* omp task */ 
   printf("Running OpenMP task:\n");
   for(int i = 1; i <= nprocs; i++)
     {
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 	     i, report_mflops(omp_task_time));
     }
 
-
+ 
   /* pthreads */
   printf("Running pThreads:\n");
   for(int i = 1; i <= nprocs; i++)

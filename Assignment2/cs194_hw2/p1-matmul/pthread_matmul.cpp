@@ -40,19 +40,33 @@ void pthread_matmuld(double **a, double **b, double **c, int nthr)
   worker_t *tInfo = new worker_t[nthr];
 
   for(int i = 0; i < nthr; ++i){
-    tInfo[0].a = a;
-    tInfo[0].b = b;
-    tInfo[0].c = c;
-    tInfo[0].start = 0;
-    tInfo[0].end = 1024;
+    tInfo[i].a = a;
+    tInfo[i].b = b;
+    tInfo[i].c = c;
+    tInfo[i].start = 1024/nthr * i;
+    tInfo[i].end = 1024/nthr * (i+1);
   }
   
-  for(int i = 0; i < nthr; ++i)
-    pthread_create(&tid[i], NULL,  matmuld_worker, &tInfo[i]);
+  for(int i = 0; i < nthr; ++i){
+    pthread_create(&thr[i], NULL,  matmuld_worker, &tInfo[i]);
+  }
 
-  for (int i = 0; i < nthr; ++i)
-    pthread_join(&tid[i], NULL);
-  
+  for (int i = 0; i < nthr; ++i){
+    pthread_join(thr[i], NULL);
+  }
+
+  //handle overflow
+  if (1024 - 1024/nthr * nthr != 0){
+    worker_t temp;
+    temp.a = a;
+    temp.b = b;
+    temp.c = c;
+    temp.start = 1024/nthr * nthr;
+    temp.end = 1024;
+
+    matmuld_worker(&temp);
+  }
+ 
   delete [] thr;
   delete [] tInfo;
 }
