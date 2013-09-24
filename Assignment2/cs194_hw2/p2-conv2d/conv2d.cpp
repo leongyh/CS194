@@ -35,7 +35,7 @@ double timestamp()
 
 void *blur_worker(void *arg)
 {
-	blur_t *param = static_cast<blur_t*)(arg);
+	blur_t *param = static_cast<blur_t*>(arg);
 	int width = param->width; 
 	int height_start = param->height_start;
 	int height_end = param->height_end;
@@ -111,13 +111,13 @@ void pthread_blur(int width, int height, int* blur_radii,	pixel_t *in, pixel_t *
 		blur_t temp;
 
 		temp.width = width;
-		temp.height_start = height/nthr * i;
-		temp.height_end = height/nthr * (i+1);
+		temp.height_start = height/nthr * nthr;
+		temp.height_end = height;
 		temp.blur_radii = blur_radii;
 		temp.in = in;
 		temp.out = out;
 
-		matmuld_worker(&temp);
+		blur_worker(&temp);
 	}
  
 	delete [] thr;
