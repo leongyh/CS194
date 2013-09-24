@@ -250,29 +250,28 @@ int main(int argc, char *argv[])
   outPix = new pixel_t[width*height];
   blur_radii = new int[width*height];
 
-  for(int y = 0; y < height; y+=(height/16))
-    {
-      for(int x = 0; x < width; x+=(width/16))
-	{
-	  int r = 1;
-	  if(n > 1)
-	    {
-	      r += (rand() % n);
-	    }
-	  for(int yy = y; yy < std::min(height, (y + (height/16))); yy++)
-	    {
-	      for(int xx = x; xx < std::min(width, (x + (width/16))); xx++)
-		{
-		  blur_radii[yy*width+xx] = r;
-		}
-	    }
-	}
-    }
-
   double t0;
 
   for (int i = 1; i <= 16; ++i)
   {	  
+  	  for(int y = 0; y < height; y+=(height/16))
+	  {
+	      for(int x = 0; x < width; x+=(width/16))
+		{
+		  int r = 1;
+		  if(n > 1)
+		    {
+		      r += (rand() % n);
+		    }
+		  for(int yy = y; yy < std::min(height, (y + (height/16))); yy++)
+		    {
+		      for(int xx = x; xx < std::min(width, (x + (width/16))); xx++)
+			{
+			  blur_radii[yy*width+xx] = r;
+			}
+		    }
+		}
+	  }
 	  convert_to_pixel(inPix, frame);
 	  t0 = timestamp();
 	  pthread_blur(width, height, blur_radii, inPix, outPix, i);
