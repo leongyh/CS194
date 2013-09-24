@@ -2,9 +2,10 @@
 
 #ifndef __READJPEG__
 #define __READJPEG__
-
+#include <stdio.h>
 extern "C"
 {
+//#include <stdio.h>
 #include <jpeglib.h>
 }
 

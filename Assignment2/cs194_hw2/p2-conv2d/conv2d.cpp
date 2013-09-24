@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 
   width = frame->image_width;
   height = frame->image_height;
- 
+ 	
   inPix = new pixel_t[width*height];
   outPix = new pixel_t[width*height];
   blur_radii = new int[width*height];
