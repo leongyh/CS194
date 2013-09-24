@@ -268,61 +268,16 @@ int main(int argc, char *argv[])
 	    }
 	}
     }
-  
-  convert_to_pixel(inPix, frame);
-  double t0 = timestamp();
-  blur_frame(width, height, blur_radii, inPix, outPix);
-  t0 = timestamp() - t0;
-  printf("Serial time: %g sec\n", t0);
 
-  convert_to_frame(frame, outPix);
-
-  write_JPEG_file(outName,frame,75);
-  destroy_frame(frame);
-
-  delete [] blur_radii;
-  delete [] inPix; 
-  delete [] outPix;
+  double t0;
 
   for (int i = 1; i <= 16; ++i)
-  {
-  	  inPix = new pixel_t[width*height];
-	  outPix = new pixel_t[width*height];
-	  blur_radii = new int[width*height];
-
-	  for(int y = 0; y < height; y+=(height/16))
-	    {
-	      for(int x = 0; x < width; x+=(width/16))
-		{
-		  int r = 1;
-		  if(n > 1)
-		    {
-		      r += (rand() % n);
-		    }
-		  for(int yy = y; yy < std::min(height, (y + (height/16))); yy++)
-		    {
-		      for(int xx = x; xx < std::min(width, (x + (width/16))); xx++)
-			{
-			  blur_radii[yy*width+xx] = r;
-			}
-		    }
-		}
-	    }
-	  
+  {	  
 	  convert_to_pixel(inPix, frame);
-	  double t0 = timestamp();
+	  t0 = timestamp();
 	  pthread_blur(width, height, blur_radii, inPix, outPix, i);
 	  t0 = timestamp() - t0;
 	  printf("Parallel time: %g sec for %d processors\n", t0, i);
-
-	  convert_to_frame(frame, outPix);
-
-	  write_JPEG_file(outName,frame,75);
-	  destroy_frame(frame);
-
-	  delete [] blur_radii;
-	  delete [] inPix; 
-	  delete [] outPix;
   }
   return 0;
 }
