@@ -1,4 +1,4 @@
-#include <emmintrin.h>
+#include "pmmintrin.h"
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -33,44 +33,41 @@ void simple_blur(float* out, int n, float* frame, int* radii){
 }
 
 void vector_blur(float* out, int n, float* frame, int* radii){
-	__m128i v1,v2,v3,v4;
+	__m128 v1,v2,v3,v4;
+	float* temp = new float[8];
 
 	for(int r=0; r<n; r++){
 		for(int c=0; c<n; c++){
 			int rd = radii[r*n+c];
 			float avg = 0;
 
-			int row_start = min(n-1, r+rd);
-			int col_start = min(n-1, c+rd);
-			int row_size = row_start - max(0,r-rd) + 1;
-			int col_size = col_start - max(0,c-rd) + 1;
-			int size = row_size * col_size
+			int row_start = max(0,r-rd);
+			int col_start = max(0,c-rd);
+			int row_size = min(n-1, r+rd) - row_start + 1;
+			int col_size = min(n-1, c+rd) - col_start + 1;
+			int size = row_size * col_size;
 
 			for(int row_batch = 0; row_batch < row_size/4; row_batch++){
 				for(int col_batch = 0; col_batch < col_size/4; col_batch++){
-					uint32_t temp[4];
+					v1 = _mm_load_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
+					v2 = _mm_load_ps((float*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
+					v3 = _mm_load_ps((float*)&frame[(row_start + row_batch*4 + 3)*n + (col_start + col_batch*4)]);
+					v4 = _mm_load_ps((float*)&frame[(row_start + row_batch*4 + 4)*n + (col_start + col_batch*4)]);
 
-					v1 = _mm_load_si128((__m128i*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
-					v2 = _mm_load_si128((__m128i*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
-					v3 = _mm_load_si128((__m128i*)&frame[(row_start + row_batch*4 + 3)*n + (col_start + col_batch*4)]);
-					v4 = _mm_load_si128((__m128i*)&frame[(row_start + row_batch*4 + 4)*n + (col_start + col_batch*4)]);
-
-					__m128i sum1 = _mm_hadd_ps(v1, v2);
-					__m128i sum2 = _mm_hadd_ps(v3, v4);
-					__m128i sum = _mm_hadd_ps(sum1, sum2);
+					__m128 sum1 = _mm_hadd_ps(v1, v2);
+					__m128 sum2 = _mm_hadd_ps(v3, v4);
+					__m128 sum = _mm_hadd_ps(sum1, sum2);
 					sum = _mm_hadd_ps(sum, sum);
 
-					_mm_store_si128((__m128i*)temp, sum);
+					_mm_store_ps((float*)&temp[0], v1);
 
-					avg += temp[0] + temp[1];
-
-					delete [] temp;
+					//avg += temp[0] + temp[1];
 				}
 			}
 
-			for(int row_single = row_size/4 * 4; i < row_start + row_size; ++row_single){
-				for (int col_single = col_start/4 * 4; i < col_start + col_size; ++col_single){
-					avg += frame[row_single*n + col_single]; 
+			for(int row_single = row_start + row_size/4 * 4; row_single < row_start + row_size; ++row_single){
+				for (int col_single = col_start + col_size/4 * 4; col_single < col_start + col_size; ++col_single){
+					avg += frame[row_single*n + col_single];
 				}
 			}
 
