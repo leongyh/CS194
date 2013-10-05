@@ -61,16 +61,55 @@ void vector_blur(float* out, int n, float* frame, int* radii){
 
 					_mm_storeu_ps((float*)&temp[0], sum);
 
-					avg += temp[0] + temp[1] + avg[2] + avg[4];
+					avg += temp[0] + temp[1] + temp[2] + temp[4];
 				}
 			}
 
 			switch(row_size % 4)
 			{
-				
+        int row_batch = row_size/4*4;
+
+				case 3:
+          for(int col_batch = 0; col_batch < col_size/4; col_batch++){
+            v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
+            v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
+            v3 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
+
+            __m128 sum1 = _mm_hadd_ps(v1, v2);
+            __m128 sum = _mm_hadd_ps(sum1, v4);
+
+            _mm_storeu_ps((float*)&temp[0], sum);
+
+            avg += temp[0] + temp[1] + temp[2] + temp[4];
+          }
+
+          case 2:
+            for(int col_batch = 0; col_batch < col_size/4; col_batch++){
+              v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
+              v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
+              
+              __m128 sum = _mm_hadd_ps(v1, v2);
+
+              _mm_storeu_ps((float*)&temp[0], sum);
+
+              avg += temp[0] + temp[1] + temp[2] + temp[4];
+            }
+
+          case 1:
+            for(int col_batch = 0; col_batch < col_size/4; col_batch++){
+              v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
+             
+              __m128 sum = _mm_hadd_ps(v1, v1);
+
+              _mm_storeu_ps((float*)&temp[0], sum);
+
+              avg += temp[0] + temp[1];
+            }
+
+          default: break;
 			}
 
-			for(int row_single = row_start + row_size/4 * 4; row_single < row_start + row_size;  ++row_single){
+			for(int row_single = row_start; row_single < row_start + row_size;  ++row_single){
 				for(int col_single = col_start + col_size/4 * 4; col_single < col_start + col_size; ++col_single){
 					avg += frame[row_single*n + col_single];
 				}
