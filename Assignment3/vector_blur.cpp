@@ -34,7 +34,7 @@ void simple_blur(float* out, int n, float* frame, int* radii){
 
 void vector_blur(float* out, int n, float* frame, int* radii){
 	__m128 v1,v2,v3,v4;
-	float* temp = new float[8];
+	float* temp = new float[4];
 
 	for(int r=0; r<n; r++){
 		for(int c=0; c<n; c++){
@@ -49,24 +49,29 @@ void vector_blur(float* out, int n, float* frame, int* radii){
 
 			for(int row_batch = 0; row_batch < row_size/4; row_batch++){
 				for(int col_batch = 0; col_batch < col_size/4; col_batch++){
-					v1 = _mm_load_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
-					v2 = _mm_load_ps((float*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
-					v3 = _mm_load_ps((float*)&frame[(row_start + row_batch*4 + 3)*n + (col_start + col_batch*4)]);
-					v4 = _mm_load_ps((float*)&frame[(row_start + row_batch*4 + 4)*n + (col_start + col_batch*4)]);
+					v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
+					v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
+					v3 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
+					v4 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 3)*n + (col_start + col_batch*4)]);
 
 					__m128 sum1 = _mm_hadd_ps(v1, v2);
 					__m128 sum2 = _mm_hadd_ps(v3, v4);
 					__m128 sum = _mm_hadd_ps(sum1, sum2);
-					sum = _mm_hadd_ps(sum, sum);
+					//sum = _mm_hadd_ps(sum, sum);
 
-					_mm_store_ps((float*)&temp[0], v1);
+					_mm_storeu_ps((float*)&temp[0], sum);
 
-					//avg += temp[0] + temp[1];
+					avg += temp[0] + temp[1] + avg[2] + avg[4];
 				}
 			}
 
-			for(int row_single = row_start + row_size/4 * 4; row_single < row_start + row_size; ++row_single){
-				for (int col_single = col_start + col_size/4 * 4; col_single < col_start + col_size; ++col_single){
+			switch(row_size % 4)
+			{
+				
+			}
+
+			for(int row_single = row_start + row_size/4 * 4; row_single < row_start + row_size;  ++row_single){
+				for(int col_single = col_start + col_size/4 * 4; col_single < col_start + col_size; ++col_single){
 					avg += frame[row_single*n + col_single];
 				}
 			}
@@ -85,12 +90,15 @@ void test(){
   src[2] = 99;
   src[3] = 66;
   v1 = _mm_load_ps((float*)&src[0]);
-  _mm_store_ps((float*)&dst[0], v1);
+
+  for(int i =0; i < 22; i++){
+    _mm_store_ps((float*)&dst[0], v1);
+  }
 
   for(int i = 0; i < 4; i++){
     if(src[i] != dst[i]){
       printf("failed at %d", i);
-      return
+      return;
     }
   }
 
@@ -120,8 +128,8 @@ int main(int argc, char *argv[])
   //Blur using vector blur
   float* out2 = new float[n*n];
   double time2 = timestamp();
-  test();
-  //vector_blur(out2, n, frame, radii);
+ // test();
+  vector_blur(out2, n, frame, radii);
   time2 = timestamp() - time2;
 
   //Check result
@@ -130,7 +138,7 @@ int main(int argc, char *argv[])
       float dif = out[i*n+j] - out2[i*n+j];
       if(dif*dif>1.0f){
         printf("Your blur does not give the right result!\n");
-        printf("For element (row, column) = (%d, %d):\n", i, j);
+        printf("For element (row, column, radii) = (%d, %d, %d):\n", i, j, radii[i*n+j]);
         printf("  Simple blur gives %.2f\n", out[i*n+j]);
         printf("  Your blur gives %.2f\n", out2[i*n+j]);
         exit(-1);
