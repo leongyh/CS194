@@ -124,16 +124,17 @@ void parallel_blur_block(float* out, int r, int c, int n, float* frame, int* rad
 void parallel_blur(float* out, int n, float* frame, int* radii, int nthr){
 	omp_set_num_threads(nthr);
 
-		#pragma omp parallel for
+		#pragma omp parallel
 		{
 			int block = n / nthr;
 			int id = omp_get_thread_num();
 
-			for(int r=0; r<n; r++)
-				for(int c=block*id; c<block*(id+1); c++)
-				{
-					parallel_blur_block(out, r, c, n, frame, radii);
-				}
+			#pragma omp parallel for
+				for(int r=0; r<n; r++)
+					for(int c=block*id; c<block*(id+1); c++)
+					{
+						parallel_blur_block(out, r, c, n, frame, radii);
+					}
 		}
 
 		for(int r=0; r<n; r++)
