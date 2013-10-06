@@ -34,104 +34,108 @@ void simple_blur(float* out, int n, float* frame, int* radii){
 }
 
 void parallel_blur(float* out, int n, float* frame, int* radii, int nthr){
+	omp_set_num_threads(nthr);
+
+		#pragma omp parallel
+		{
+			#pragma omp single
+			{
+				for(int r=0; r<n; r++)
+					for(int c=0; c<n; c++)
+					{
+						#pragma omp task
+							parallel_blur_block(out, r, c, frame, radii);
+					}
+			}
+		}
+}
+
+void parallel_blur_block(float* out, int r, int c, float* frame, int* radii){
 	__m128 v1,v2,v3,v4;
 	float* temp = new float[4];
 
-	omp_set_num_threads(nthr);
+	int rd = radii[r*n+c];
+	float avg = 0;
 
-	#pragma omp parallel
-	{
-	#pragma omp single
-	{
-		#pragma omp task
-		for(int r=0; r<n; r++){
-			for(int c=0; c<n; c++){
-				int rd = radii[r*n+c];
-				float avg = 0;
+	int row_start = max(0,r-rd);
+	int col_start = max(0,c-rd);
+	int row_size = min(n-1, r+rd) - row_start + 1;
+	int col_size = min(n-1, c+rd) - col_start + 1;
+	int size = row_size * col_size;
 
-				int row_start = max(0,r-rd);
-				int col_start = max(0,c-rd);
-				int row_size = min(n-1, r+rd) - row_start + 1;
-				int col_size = min(n-1, c+rd) - col_start + 1;
-				int size = row_size * col_size;
+	for(int row_batch = 0; row_batch < row_size/4; row_batch++){
+		for(int col_batch = 0; col_batch < col_size/4; col_batch++){
+			v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
+			v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
+			v3 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
+			v4 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 3)*n + (col_start + col_batch*4)]);
 
-				for(int row_batch = 0; row_batch < row_size/4; row_batch++){
-					for(int col_batch = 0; col_batch < col_size/4; col_batch++){
-						v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
-						v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
-						v3 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
-						v4 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 3)*n + (col_start + col_batch*4)]);
+			__m128 sum1 = _mm_hadd_ps(v1, v2);
+			__m128 sum2 = _mm_hadd_ps(v3, v4);
+			__m128 sum = _mm_hadd_ps(sum1, sum2);
 
-						__m128 sum1 = _mm_hadd_ps(v1, v2);
-						__m128 sum2 = _mm_hadd_ps(v3, v4);
-						__m128 sum = _mm_hadd_ps(sum1, sum2);
+			_mm_store_ps((float*)&temp[0], sum);
 
-						_mm_store_ps((float*)&temp[0], sum);
-
-						avg += (temp[0] + temp[1] + temp[2] + temp[3]);
-					}
-				}
-
-				int row_batch = row_size/4;
-				
-				switch(row_size % 4)
-				{
-					case 3:
-						for(int col_batch = 0; col_batch < col_size/4; col_batch++){
-							v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
-							v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
-							v3 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
-
-							__m128 sum1 = _mm_hadd_ps(v1, v2);
-							__m128 sum = _mm_hadd_ps(sum1, v3);
-
-							_mm_store_ps((float*)&temp[0], sum);
-
-							avg += temp[0] + temp[1] + temp[2] + temp[3];
-						}
-						break;
-
-					case 2:
-						for(int col_batch = 0; col_batch < col_size/4; col_batch++){
-							v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
-							v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
-								
-							__m128 sum = _mm_hadd_ps(v1, v2);
-
-							_mm_store_ps((float*)&temp[0], sum);
-
-							avg += (temp[0] + temp[1] + temp[2] + temp[3]);
-						}
-						break;
-
-					case 1:
-						for(int col_batch = 0; col_batch < col_size/4; col_batch++){
-							v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
-						 
-							__m128 sum = _mm_hadd_ps(v1, v1);
-
-							_mm_store_ps((float*)&temp[0], sum);
-
-							avg += (temp[0] + temp[1]);
-
-						}
-						break;
-
-					case 0:
-						avg += 0;
-				}
-
-				for(int row_single = row_start; row_single < row_start + row_size;  row_single++){
-					for(int col_single = col_start + col_size/4 * 4; col_single < col_start + col_size; col_single++){
-						avg += frame[row_single*n + col_single];
-					}
-				}
-
-				out[r*n+c] = avg/size;
-			}
+			avg += (temp[0] + temp[1] + temp[2] + temp[3]);
 		}
 	}
+
+	int row_batch = row_size/4;
+	
+	switch(row_size % 4)
+	{
+		case 3:
+			for(int col_batch = 0; col_batch < col_size/4; col_batch++){
+				v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
+				v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
+				v3 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 2)*n + (col_start + col_batch*4)]);
+
+				__m128 sum1 = _mm_hadd_ps(v1, v2);
+				__m128 sum = _mm_hadd_ps(sum1, v3);
+
+				_mm_store_ps((float*)&temp[0], sum);
+
+				avg += temp[0] + temp[1] + temp[2] + temp[3];
+			}
+			break;
+
+		case 2:
+			for(int col_batch = 0; col_batch < col_size/4; col_batch++){
+				v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
+				v2 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 1)*n + (col_start + col_batch*4)]);
+					
+				__m128 sum = _mm_hadd_ps(v1, v2);
+
+				_mm_store_ps((float*)&temp[0], sum);
+
+				avg += (temp[0] + temp[1] + temp[2] + temp[3]);
+			}
+			break;
+
+		case 1:
+			for(int col_batch = 0; col_batch < col_size/4; col_batch++){
+				v1 = _mm_loadu_ps((float*)&frame[(row_start + row_batch*4 + 0)*n + (col_start + col_batch*4)]);
+			 
+				__m128 sum = _mm_hadd_ps(v1, v1);
+
+				_mm_store_ps((float*)&temp[0], sum);
+
+				avg += (temp[0] + temp[1]);
+
+			}
+			break;
+
+		case 0:
+			avg += 0;
 	}
+
+	for(int row_single = row_start; row_single < row_start + row_size;  row_single++){
+		for(int col_single = col_start + col_size/4 * 4; col_single < col_start + col_size; col_single++){
+			avg += frame[row_single*n + col_single];
+		}
+	}
+
+	out[r*n+c] = avg/size;
 }
 
 int main(int argc, char *argv[])
