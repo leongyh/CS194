@@ -33,24 +33,7 @@ void simple_blur(float* out, int n, float* frame, int* radii){
 		}
 }
 
-void parallel_blur(float* out, int n, float* frame, int* radii, int nthr){
-	omp_set_num_threads(nthr);
-
-		#pragma omp parallel
-		{
-			#pragma omp single
-			{
-				for(int r=0; r<n; r++)
-					for(int c=0; c<n; c++)
-					{
-						#pragma omp task
-							parallel_blur_block(out, r, c, frame, radii);
-					}
-			}
-		}
-}
-
-void parallel_blur_block(float* out, int r, int c, float* frame, int* radii){
+void parallel_blur_block(float* out, int r, int c, int n, float* frame, int* radii){
 	__m128 v1,v2,v3,v4;
 	float* temp = new float[4];
 
@@ -136,6 +119,23 @@ void parallel_blur_block(float* out, int r, int c, float* frame, int* radii){
 	}
 
 	out[r*n+c] = avg/size;
+}
+
+void parallel_blur(float* out, int n, float* frame, int* radii, int nthr){
+	omp_set_num_threads(nthr);
+
+		#pragma omp parallel
+		{
+			#pragma omp single
+			{
+				for(int r=0; r<n; r++)
+					for(int c=0; c<n; c++)
+					{
+						#pragma omp task
+							parallel_blur_block(out, r, c, n, frame, radii);
+					}
+			}
+		}
 }
 
 int main(int argc, char *argv[])
