@@ -58,7 +58,7 @@ void vector_blur(float* out, int n, float* frame, int* radii){
 					__m128 sum2 = _mm_hadd_ps(v3, v4);
 					__m128 sum = _mm_hadd_ps(sum1, sum2);
 
-					_mm_storeu_ps((float*)&temp[0], sum);
+					_mm_store_ps((float*)&temp[0], sum);
 
 					avg += (temp[0] + temp[1] + temp[2] + temp[3]);
 				}
@@ -77,7 +77,7 @@ void vector_blur(float* out, int n, float* frame, int* radii){
 						__m128 sum1 = _mm_hadd_ps(v1, v2);
 						__m128 sum = _mm_hadd_ps(sum1, v3);
 
-						_mm_storeu_ps((float*)&temp[0], sum);
+						_mm_store_ps((float*)&temp[0], sum);
 
 						avg += temp[0] + temp[1] + temp[2] + temp[3];
 					}
@@ -90,7 +90,7 @@ void vector_blur(float* out, int n, float* frame, int* radii){
 							
 						__m128 sum = _mm_hadd_ps(v1, v2);
 
-						_mm_storeu_ps((float*)&temp[0], sum);
+						_mm_store_ps((float*)&temp[0], sum);
 
 						avg += (temp[0] + temp[1] + temp[2] + temp[3]);
 					}
@@ -102,7 +102,7 @@ void vector_blur(float* out, int n, float* frame, int* radii){
 					 
 						__m128 sum = _mm_hadd_ps(v1, v1);
 
-						_mm_storeu_ps((float*)&temp[0], sum);
+						_mm_store_ps((float*)&temp[0], sum);
 
 						avg += (temp[0] + temp[1]);
 
@@ -122,30 +122,6 @@ void vector_blur(float* out, int n, float* frame, int* radii){
 			out[r*n+c] = avg/size;
 		}
 	}
-}
-
-void test(){
-	__m128 v1,v2,v3,v4;
-	float* src = new float[4];
-	float* dst = new float[4];
-	src[0] = 4;
-	src[1] = 8;
-	src[2] = 99;
-	src[3] = 66;
-	v1 = _mm_load_ps((float*)&src[0]);
-
-	for(int i =0; i < 22; i++){
-		_mm_store_ps((float*)&dst[0], v1);
-	}
-
-	for(int i = 0; i < 4; i++){
-		if(src[i] != dst[i]){
-			printf("failed at %d", i);
-			return;
-		}
-	}
-
-	printf("%s\n", "passed");
 }
 
 int main(int argc, char *argv[])
@@ -171,7 +147,6 @@ int main(int argc, char *argv[])
 	//Blur using vector blur
 	float* out2 = new float[n*n];
 	double time2 = timestamp();
- // test();
 	vector_blur(out2, n, frame, radii);
 	time2 = timestamp() - time2;
 
