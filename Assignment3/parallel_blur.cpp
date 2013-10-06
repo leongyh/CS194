@@ -39,7 +39,11 @@ void parallel_blur(float* out, int n, float* frame, int* radii, int nthr){
 
 	omp_set_num_threads(nthr);
 
-	#pragma omp parallel for
+	#pragma omp parallel
+	{
+	#pragma omp single
+	{
+		#pragma omp task
 		for(int r=0; r<n; r++){
 			for(int c=0; c<n; c++){
 				int rd = radii[r*n+c];
@@ -126,6 +130,8 @@ void parallel_blur(float* out, int n, float* frame, int* radii, int nthr){
 				out[r*n+c] = avg/size;
 			}
 		}
+	}
+	}
 }
 
 int main(int argc, char *argv[])
