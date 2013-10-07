@@ -129,20 +129,21 @@ void fastest_blur(float* out, int n, float* frame, int* radii, int nthr){
 	omp_set_num_threads(nthr);
 
 	int num_tasks = 1000;
-	int load_size = (n*n)/num_tasks;
+	int load_size = n/num_tasks;
 
-		#pragma omp parallel
+	#pragma omp parallel
+	{
+		#pragma omp single
 		{
 			for(int r=0; r*load_size<(n/load_size)*load_size; r++)
-				for(int c=0; c*load_size<(n/load_size)*load_size; c++)
-				{
-					#pragma omp task
-						fastest_blur_block(out, r*load_size, c*load_size, (r+1)*load_size, (c+1)*load_size, n, frame, radii);
-				}
+			{
+				#pragma omp task
+					fastest_blur_block(out, r*load_size, 0, (r+1)*load_size, n, n, frame, radii);
+			}
 		}
+	}
 
-		fastest_blur_block(out, 0, (n/load_size)*load_size, n, n, n, frame, radii);
-		fastest_blur_block(out, (n/load_size)*load_size, 0, n, (n/load_size)*load_size, n, frame, radii);
+	fastest_blur_block(out, (n/load_size)*load_size, 0, n, n, n, frame, radii);
 }
 
 int main(int argc, char *argv[])
@@ -185,7 +186,7 @@ int main(int argc, char *argv[])
 					printf("  Your blur gives %.2f\n", out2[i*n+j]);
 					exit(-1);
 				}
-		}
+			}
 		
 		delete[] out2;
 

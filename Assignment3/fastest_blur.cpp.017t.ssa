@@ -1,0 +1,1553 @@
+
+;; Function __m128 _mm_loadu_ps(const float*) (_Z12_mm_loadu_psPKf)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 3
+Number of blocks to update: 2 ( 67%)
+
+
+
+__m128 _mm_loadu_ps(const float*) (const float * __P)
+{
+  __m128 D.13373;
+  __m128 D.13371;
+
+<bb 2>:
+  D.13373_2 = __builtin_ia32_loadups (__P_1(D));
+  D.13371_3 = D.13373_2;
+  return D.13371_3;
+
+}
+
+
+
+;; Function void _mm_store_ps(float*, __m128) (_Z12_mm_store_psPfU8__vectorf)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 3
+Number of blocks to update: 2 ( 67%)
+
+
+
+void _mm_store_ps(float*, __m128) (float * __P, __m128 __A)
+{
+<bb 2>:
+  MEM[(__v4sf *)__P_1(D)] = __A_2(D);
+  return;
+
+}
+
+
+
+;; Function __m128 _mm_hadd_ps(__m128, __m128) (_Z11_mm_hadd_psU8__vectorfS_)
+
+__m128 _mm_hadd_ps(__m128, __m128) (__m128 __X, __m128 __Y)
+{
+  __m128 D.13379;
+  __m128 D.13377;
+
+<bb 2>:
+  D.13379_3 = __builtin_ia32_haddps (__X_1(D), __Y_2(D));
+  D.13377_4 = D.13379_3;
+  return D.13377_4;
+
+}
+
+
+
+;; Function int printf(const char*, ...) (printf)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 3
+Number of blocks to update: 2 ( 67%)
+
+
+
+int printf(const char*, ...) (const char * restrict __fmt)
+{
+  int D.13083;
+  int D.13081;
+
+<bb 2>:
+  D.13083_2 = __printf_chk (1, __fmt_1(D), __builtin_va_arg_pack ());
+  D.13081_3 = D.13083_2;
+  return D.13081_3;
+
+}
+
+
+
+;; Function double timestamp() (_Z9timestampv)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 3
+Number of blocks to update: 2 ( 67%)
+
+
+
+double timestamp() ()
+{
+  struct timeval tv;
+  double D.13433;
+  double D.13432;
+  __suseconds_t D.13431;
+  double D.13430;
+  __time_t D.13429;
+  double D.13428;
+
+<bb 2>:
+  gettimeofday (&tv, 0B);
+  D.13429_1 = tv.tv_sec;
+  D.13430_2 = (double) D.13429_1;
+  D.13431_3 = tv.tv_usec;
+  D.13432_4 = (double) D.13431_3;
+  D.13433_5 = D.13432_4 * 9.99999999999999954748111825886258685613938723690807819366e-7;
+  D.13428_6 = D.13430_2 + D.13433_5;
+  return D.13428_6;
+
+}
+
+
+
+;; Function const _Tp& std::max(const _Tp&, const _Tp&) [with _Tp = int] (_ZSt3maxIiERKT_S2_S2_)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 6
+Number of blocks to update: 5 ( 83%)
+
+
+
+const _Tp& std::max(const _Tp&, const _Tp&) [with _Tp = int] (const int & __a, const int & __b)
+{
+  const int & D.13363;
+  const int D.13360;
+  const int D.13359;
+
+<bb 2>:
+  D.13359_3 = *__a_2(D);
+  D.13360_5 = *__b_4(D);
+  if (D.13359_3 < D.13360_5)
+    goto <bb 3>;
+  else
+    goto <bb 4>;
+
+<bb 3>:
+  D.13363_6 = __b_4(D);
+  goto <bb 5>;
+
+<bb 4>:
+  D.13363_7 = __a_2(D);
+
+<bb 5>:
+  # D.13363_1 = PHI <D.13363_6(3), D.13363_7(4)>
+  return D.13363_1;
+
+}
+
+
+
+;; Function const _Tp& std::min(const _Tp&, const _Tp&) [with _Tp = int] (_ZSt3minIiERKT_S2_S2_)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 6
+Number of blocks to update: 5 ( 83%)
+
+
+
+const _Tp& std::min(const _Tp&, const _Tp&) [with _Tp = int] (const int & __a, const int & __b)
+{
+  const int & D.13369;
+  const int D.13366;
+  const int D.13365;
+
+<bb 2>:
+  D.13365_3 = *__b_2(D);
+  D.13366_5 = *__a_4(D);
+  if (D.13365_3 < D.13366_5)
+    goto <bb 3>;
+  else
+    goto <bb 4>;
+
+<bb 3>:
+  D.13369_6 = __b_2(D);
+  goto <bb 5>;
+
+<bb 4>:
+  D.13369_7 = __a_4(D);
+
+<bb 5>:
+  # D.13369_1 = PHI <D.13369_6(3), D.13369_7(4)>
+  return D.13369_1;
+
+}
+
+
+
+;; Function void fastest_blur_block(float*, int, int, int, int, int, float*, int*) (_Z18fastest_blur_blockPfiiiiiS_Pi)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 32
+Number of blocks to update: 31 ( 97%)
+
+
+
+void fastest_blur_block(float*, int, int, int, int, int, float*, int*) (float * out, int rs, int cs, int re, int ce, int n, float * frame, int * radii)
+{
+  __m128 D.13358;
+  __m128 D.13357;
+  __m128 D.13356;
+  __m128 D.13355;
+  __m128 D.13354;
+  __m128 D.13353;
+  __m128 D.13352;
+  __m128 D.13351;
+  __m128 D.13350;
+  __m128 D.13349;
+  __m128 D.13348;
+  __m128 D.13347;
+  __m128 D.13346;
+  __m128 D.13345;
+  __m128 D.13344;
+  __m128 D.13343;
+  __m128 D.13342;
+  float * D.13341;
+  int col_single;
+  int row_single;
+  __m128 sum;
+  int col_batch;
+  __m128 sum;
+  int col_batch;
+  __m128 sum;
+  __m128 sum1;
+  int col_batch;
+  __m128 sum;
+  __m128 sum2;
+  __m128 sum1;
+  int col_batch;
+  int row_batch;
+  int row_batch;
+  int size;
+  int col_size;
+  int row_size;
+  int col_start;
+  int row_start;
+  float avg;
+  int rd;
+  int c;
+  int r;
+  float * temp;
+  __m128 v4;
+  __m128 v3;
+  __m128 v2;
+  __m128 v1;
+  float D.13340;
+  float D.13339;
+  float * D.13338;
+  float D.13337;
+  float * D.13336;
+  long unsigned int D.13335;
+  long unsigned int D.13334;
+  int D.13333;
+  int D.13332;
+  bool D.13330;
+  int D.13329;
+  int D.13325;
+  bool D.13323;
+  int D.13322;
+  const float * D.13317;
+  long unsigned int D.13316;
+  long unsigned int D.13315;
+  int D.13314;
+  int D.13313;
+  int D.13312;
+  bool D.13310;
+  const float * D.13306;
+  long unsigned int D.13305;
+  long unsigned int D.13304;
+  int D.13303;
+  int D.13302;
+  const float * D.13301;
+  long unsigned int D.13300;
+  long unsigned int D.13299;
+  int D.13298;
+  int D.13297;
+  int D.13296;
+  bool D.13294;
+  const float * D.13290;
+  long unsigned int D.13289;
+  long unsigned int D.13288;
+  int D.13287;
+  int D.13286;
+  int D.13285;
+  int D.13284;
+  const float * D.13283;
+  long unsigned int D.13282;
+  long unsigned int D.13281;
+  int D.13280;
+  int D.13279;
+  int D.13278;
+  int D.13277;
+  const float * D.13276;
+  long unsigned int D.13275;
+  long unsigned int D.13274;
+  int D.13273;
+  int D.13272;
+  int D.13271;
+  int D.13270;
+  int D.13269;
+  int D.13268;
+  bool D.13266;
+  int D.13262;
+  float D.13260;
+  float D.13259;
+  float * D.13258;
+  float D.13257;
+  float D.13256;
+  float * D.13255;
+  float D.13254;
+  float D.13253;
+  float * D.13252;
+  float D.13251;
+  const float * D.13250;
+  long unsigned int D.13249;
+  long unsigned int D.13248;
+  int D.13247;
+  int D.13246;
+  int D.13245;
+  int D.13244;
+  const float * D.13243;
+  long unsigned int D.13242;
+  long unsigned int D.13241;
+  int D.13240;
+  int D.13239;
+  int D.13238;
+  int D.13237;
+  const float * D.13236;
+  long unsigned int D.13235;
+  long unsigned int D.13234;
+  int D.13233;
+  int D.13232;
+  int D.13231;
+  int D.13230;
+  const float * D.13229;
+  long unsigned int D.13228;
+  long unsigned int D.13227;
+  int D.13226;
+  int D.13225;
+  int D.13224;
+  int D.13223;
+  int D.13222;
+  int D.13221;
+  bool D.13219;
+  int D.13218;
+  bool D.13213;
+  int D.13212;
+  int D.13208;
+  const int D.13207;
+  const int & D.13206;
+  const int D.12940;
+  int D.13205;
+  const int D.12941;
+  int D.13204;
+  const int D.13203;
+  const int & D.13202;
+  int D.13201;
+  const int D.12937;
+  int D.13200;
+  const int D.12938;
+  const int & D.13199;
+  const int D.12934;
+  int D.13198;
+  const int D.12935;
+  const int & D.13197;
+  const int D.12931;
+  int D.13196;
+  const int D.12932;
+  int * D.13195;
+  long unsigned int D.13194;
+  long unsigned int D.13193;
+  int D.13192;
+  int D.13191;
+  bool D.13189;
+  bool D.13184;
+
+<bb 2>:
+  D.13341_18 = operator new [] (16);
+  temp_19 = D.13341_18;
+  r_21 = rs_20(D);
+  goto <bb 30>;
+
+<bb 3>:
+  c_25 = cs_24(D);
+  goto <bb 28>;
+
+<bb 4>:
+  D.13191_29 = r_1 * n_28(D);
+  D.13192_30 = D.13191_29 + c_2;
+  D.13193_31 = (long unsigned int) D.13192_30;
+  D.13194_32 = D.13193_31 * 4;
+  D.13195_34 = radii_33(D) + D.13194_32;
+  rd_35 = *D.13195_34;
+  avg_36 = 0.0;
+  D.13196_37 = r_1 - rd_35;
+  D.12932 = D.13196_37;
+  D.12931 = 0;
+  D.13197_38 = std::max<int> (&D.12931, &D.12932);
+  row_start_39 = *D.13197_38;
+  D.13198_40 = c_2 - rd_35;
+  D.12935 = D.13198_40;
+  D.12934 = 0;
+  D.13199_41 = std::max<int> (&D.12934, &D.12935);
+  col_start_42 = *D.13199_41;
+  D.13200_43 = r_1 + rd_35;
+  D.12938 = D.13200_43;
+  D.13201_44 = n_28(D) + -1;
+  D.12937 = D.13201_44;
+  D.13202_45 = std::min<int> (&D.12937, &D.12938);
+  D.13203_46 = *D.13202_45;
+  D.13204_47 = D.13203_46 - row_start_39;
+  row_size_48 = D.13204_47 + 1;
+  D.13205_49 = c_2 + rd_35;
+  D.12941 = D.13205_49;
+  D.13201_50 = n_28(D) + -1;
+  D.12940 = D.13201_50;
+  D.13206_51 = std::min<int> (&D.12940, &D.12941);
+  D.13207_52 = *D.13206_51;
+  D.13208_53 = D.13207_52 - col_start_42;
+  col_size_54 = D.13208_53 + 1;
+  size_55 = row_size_48 * col_size_54;
+  row_batch_56 = 0;
+  goto <bb 9>;
+
+<bb 5>:
+  col_batch_59 = 0;
+  goto <bb 7>;
+
+<bb 6>:
+  D.13221_62 = col_batch_12 * 4;
+  D.13222_63 = row_batch_11 * 4;
+  D.13223_64 = D.13222_63 + row_start_39;
+  D.13224_65 = D.13223_64 * n_28(D);
+  D.13225_66 = D.13221_62 + D.13224_65;
+  D.13226_67 = D.13225_66 + col_start_42;
+  D.13227_68 = (long unsigned int) D.13226_67;
+  D.13228_69 = D.13227_68 * 4;
+  D.13229_71 = frame_70(D) + D.13228_69;
+  D.13342_72 = _mm_loadu_ps (D.13229_71);
+  v1_73 = D.13342_72;
+  D.13221_74 = col_batch_12 * 4;
+  D.13222_75 = row_batch_11 * 4;
+  D.13223_76 = D.13222_75 + row_start_39;
+  D.13230_77 = D.13223_76 + 1;
+  D.13231_78 = D.13230_77 * n_28(D);
+  D.13232_79 = D.13221_74 + D.13231_78;
+  D.13233_80 = D.13232_79 + col_start_42;
+  D.13234_81 = (long unsigned int) D.13233_80;
+  D.13235_82 = D.13234_81 * 4;
+  D.13236_83 = frame_70(D) + D.13235_82;
+  D.13343_84 = _mm_loadu_ps (D.13236_83);
+  v2_85 = D.13343_84;
+  D.13221_86 = col_batch_12 * 4;
+  D.13222_87 = row_batch_11 * 4;
+  D.13223_88 = D.13222_87 + row_start_39;
+  D.13237_89 = D.13223_88 + 2;
+  D.13238_90 = D.13237_89 * n_28(D);
+  D.13239_91 = D.13221_86 + D.13238_90;
+  D.13240_92 = D.13239_91 + col_start_42;
+  D.13241_93 = (long unsigned int) D.13240_92;
+  D.13242_94 = D.13241_93 * 4;
+  D.13243_95 = frame_70(D) + D.13242_94;
+  D.13344_96 = _mm_loadu_ps (D.13243_95);
+  v3_97 = D.13344_96;
+  D.13221_98 = col_batch_12 * 4;
+  D.13222_99 = row_batch_11 * 4;
+  D.13223_100 = D.13222_99 + row_start_39;
+  D.13244_101 = D.13223_100 + 3;
+  D.13245_102 = D.13244_101 * n_28(D);
+  D.13246_103 = D.13221_98 + D.13245_102;
+  D.13247_104 = D.13246_103 + col_start_42;
+  D.13248_105 = (long unsigned int) D.13247_104;
+  D.13249_106 = D.13248_105 * 4;
+  D.13250_107 = frame_70(D) + D.13249_106;
+  D.13345_108 = _mm_loadu_ps (D.13250_107);
+  v4_109 = D.13345_108;
+  D.13346_110 = _mm_hadd_ps (v1_73, v2_85);
+  sum1_111 = D.13346_110;
+  D.13347_112 = _mm_hadd_ps (v3_97, v4_109);
+  sum2_113 = D.13347_112;
+  D.13348_114 = _mm_hadd_ps (sum1_111, sum2_113);
+  sum_115 = D.13348_114;
+  _mm_store_ps (temp_19, sum_115);
+  D.13251_116 = *temp_19;
+  D.13252_117 = temp_19 + 4;
+  D.13253_118 = *D.13252_117;
+  D.13254_119 = D.13251_116 + D.13253_118;
+  D.13255_120 = temp_19 + 8;
+  D.13256_121 = *D.13255_120;
+  D.13257_122 = D.13254_119 + D.13256_121;
+  D.13258_123 = temp_19 + 12;
+  D.13259_124 = *D.13258_123;
+  D.13260_125 = D.13257_122 + D.13259_124;
+  avg_126 = D.13260_125 + avg_3;
+  col_batch_127 = col_batch_12 + 1;
+
+<bb 7>:
+  # avg_3 = PHI <avg_4(5), avg_126(6)>
+  # col_batch_12 = PHI <col_batch_59(5), col_batch_127(6)>
+  D.13218_60 = col_size_54 / 4;
+  D.13219_61 = D.13218_60 > col_batch_12;
+  if (D.13219_61 != 0)
+    goto <bb 6>;
+  else
+    goto <bb 8>;
+
+<bb 8>:
+  row_batch_128 = row_batch_11 + 1;
+
+<bb 9>:
+  # avg_4 = PHI <avg_36(4), avg_3(8)>
+  # row_batch_11 = PHI <row_batch_56(4), row_batch_128(8)>
+  D.13212_57 = row_size_48 / 4;
+  D.13213_58 = D.13212_57 > row_batch_11;
+  if (D.13213_58 != 0)
+    goto <bb 5>;
+  else
+    goto <bb 10>;
+
+<bb 10>:
+  row_batch_129 = row_size_48 / 4;
+  D.13262_130 = row_size_48 % 4;
+  switch (D.13262_130) <default: <L21>, case 0: <L20>, case 1: <L16>, case 2: <L12>, case 3: <L8>>
+
+<L8>:
+  col_batch_131 = 0;
+  goto <bb 13>;
+
+<bb 12>:
+  D.13268_134 = col_batch_13 * 4;
+  D.13269_135 = row_batch_129 * 4;
+  D.13270_136 = D.13269_135 + row_start_39;
+  D.13271_137 = D.13270_136 * n_28(D);
+  D.13272_138 = D.13268_134 + D.13271_137;
+  D.13273_139 = D.13272_138 + col_start_42;
+  D.13274_140 = (long unsigned int) D.13273_139;
+  D.13275_141 = D.13274_140 * 4;
+  D.13276_142 = frame_70(D) + D.13275_141;
+  D.13349_143 = _mm_loadu_ps (D.13276_142);
+  v1_144 = D.13349_143;
+  D.13268_145 = col_batch_13 * 4;
+  D.13269_146 = row_batch_129 * 4;
+  D.13270_147 = D.13269_146 + row_start_39;
+  D.13277_148 = D.13270_147 + 1;
+  D.13278_149 = D.13277_148 * n_28(D);
+  D.13279_150 = D.13268_145 + D.13278_149;
+  D.13280_151 = D.13279_150 + col_start_42;
+  D.13281_152 = (long unsigned int) D.13280_151;
+  D.13282_153 = D.13281_152 * 4;
+  D.13283_154 = frame_70(D) + D.13282_153;
+  D.13350_155 = _mm_loadu_ps (D.13283_154);
+  v2_156 = D.13350_155;
+  D.13268_157 = col_batch_13 * 4;
+  D.13269_158 = row_batch_129 * 4;
+  D.13270_159 = D.13269_158 + row_start_39;
+  D.13284_160 = D.13270_159 + 2;
+  D.13285_161 = D.13284_160 * n_28(D);
+  D.13286_162 = D.13268_157 + D.13285_161;
+  D.13287_163 = D.13286_162 + col_start_42;
+  D.13288_164 = (long unsigned int) D.13287_163;
+  D.13289_165 = D.13288_164 * 4;
+  D.13290_166 = frame_70(D) + D.13289_165;
+  D.13351_167 = _mm_loadu_ps (D.13290_166);
+  v3_168 = D.13351_167;
+  D.13352_169 = _mm_hadd_ps (v1_144, v2_156);
+  sum1_170 = D.13352_169;
+  D.13353_171 = _mm_hadd_ps (sum1_170, v3_168);
+  sum_172 = D.13353_171;
+  _mm_store_ps (temp_19, sum_172);
+  D.13251_173 = *temp_19;
+  D.13252_174 = temp_19 + 4;
+  D.13253_175 = *D.13252_174;
+  D.13254_176 = D.13251_173 + D.13253_175;
+  D.13255_177 = temp_19 + 8;
+  D.13256_178 = *D.13255_177;
+  D.13257_179 = D.13254_176 + D.13256_178;
+  D.13258_180 = temp_19 + 12;
+  D.13259_181 = *D.13258_180;
+  D.13260_182 = D.13257_179 + D.13259_181;
+  avg_183 = D.13260_182 + avg_5;
+  col_batch_184 = col_batch_13 + 1;
+
+<bb 13>:
+  # avg_5 = PHI <avg_4(11), avg_183(12)>
+  # col_batch_13 = PHI <col_batch_131(11), col_batch_184(12)>
+  D.13218_132 = col_size_54 / 4;
+  D.13266_133 = D.13218_132 > col_batch_13;
+  if (D.13266_133 != 0)
+    goto <bb 12>;
+  else
+    goto <bb 21> (<L21>);
+
+<L12>:
+  col_batch_185 = 0;
+  goto <bb 16>;
+
+<bb 15>:
+  D.13296_188 = col_batch_14 * 4;
+  D.13269_189 = row_batch_129 * 4;
+  D.13270_190 = D.13269_189 + row_start_39;
+  D.13271_191 = D.13270_190 * n_28(D);
+  D.13297_192 = D.13296_188 + D.13271_191;
+  D.13298_193 = D.13297_192 + col_start_42;
+  D.13299_194 = (long unsigned int) D.13298_193;
+  D.13300_195 = D.13299_194 * 4;
+  D.13301_196 = frame_70(D) + D.13300_195;
+  D.13354_197 = _mm_loadu_ps (D.13301_196);
+  v1_198 = D.13354_197;
+  D.13296_199 = col_batch_14 * 4;
+  D.13269_200 = row_batch_129 * 4;
+  D.13270_201 = D.13269_200 + row_start_39;
+  D.13277_202 = D.13270_201 + 1;
+  D.13278_203 = D.13277_202 * n_28(D);
+  D.13302_204 = D.13296_199 + D.13278_203;
+  D.13303_205 = D.13302_204 + col_start_42;
+  D.13304_206 = (long unsigned int) D.13303_205;
+  D.13305_207 = D.13304_206 * 4;
+  D.13306_208 = frame_70(D) + D.13305_207;
+  D.13355_209 = _mm_loadu_ps (D.13306_208);
+  v2_210 = D.13355_209;
+  D.13356_211 = _mm_hadd_ps (v1_198, v2_210);
+  sum_212 = D.13356_211;
+  _mm_store_ps (temp_19, sum_212);
+  D.13251_213 = *temp_19;
+  D.13252_214 = temp_19 + 4;
+  D.13253_215 = *D.13252_214;
+  D.13254_216 = D.13251_213 + D.13253_215;
+  D.13255_217 = temp_19 + 8;
+  D.13256_218 = *D.13255_217;
+  D.13257_219 = D.13254_216 + D.13256_218;
+  D.13258_220 = temp_19 + 12;
+  D.13259_221 = *D.13258_220;
+  D.13260_222 = D.13257_219 + D.13259_221;
+  avg_223 = D.13260_222 + avg_6;
+  col_batch_224 = col_batch_14 + 1;
+
+<bb 16>:
+  # avg_6 = PHI <avg_4(14), avg_223(15)>
+  # col_batch_14 = PHI <col_batch_185(14), col_batch_224(15)>
+  D.13218_186 = col_size_54 / 4;
+  D.13294_187 = D.13218_186 > col_batch_14;
+  if (D.13294_187 != 0)
+    goto <bb 15>;
+  else
+    goto <bb 21> (<L21>);
+
+<L16>:
+  col_batch_225 = 0;
+  goto <bb 19>;
+
+<bb 18>:
+  D.13312_228 = col_batch_15 * 4;
+  D.13269_229 = row_batch_129 * 4;
+  D.13270_230 = D.13269_229 + row_start_39;
+  D.13271_231 = D.13270_230 * n_28(D);
+  D.13313_232 = D.13312_228 + D.13271_231;
+  D.13314_233 = D.13313_232 + col_start_42;
+  D.13315_234 = (long unsigned int) D.13314_233;
+  D.13316_235 = D.13315_234 * 4;
+  D.13317_236 = frame_70(D) + D.13316_235;
+  D.13357_237 = _mm_loadu_ps (D.13317_236);
+  v1_238 = D.13357_237;
+  D.13358_239 = _mm_hadd_ps (v1_238, v1_238);
+  sum_240 = D.13358_239;
+  _mm_store_ps (temp_19, sum_240);
+  D.13251_241 = *temp_19;
+  D.13252_242 = temp_19 + 4;
+  D.13253_243 = *D.13252_242;
+  D.13254_244 = D.13251_241 + D.13253_243;
+  avg_245 = D.13254_244 + avg_7;
+  col_batch_246 = col_batch_15 + 1;
+
+<bb 19>:
+  # avg_7 = PHI <avg_4(17), avg_245(18)>
+  # col_batch_15 = PHI <col_batch_225(17), col_batch_246(18)>
+  D.13218_226 = col_size_54 / 4;
+  D.13310_227 = D.13218_226 > col_batch_15;
+  if (D.13310_227 != 0)
+    goto <bb 18>;
+  else
+    goto <bb 21> (<L21>);
+
+<L20>:
+  avg_247 = avg_4 + 0.0;
+
+  # avg_8 = PHI <avg_4(10), avg_5(13), avg_6(16), avg_7(19), avg_247(20)>
+<L21>:
+  row_single_248 = row_start_39;
+  goto <bb 26>;
+
+<bb 22>:
+  D.13218_251 = col_size_54 / 4;
+  D.13325_252 = D.13218_251 * 4;
+  col_single_253 = D.13325_252 + col_start_42;
+  goto <bb 24>;
+
+<bb 23>:
+  D.13332_256 = row_single_16 * n_28(D);
+  D.13333_257 = D.13332_256 + col_single_17;
+  D.13334_258 = (long unsigned int) D.13333_257;
+  D.13335_259 = D.13334_258 * 4;
+  D.13336_260 = frame_70(D) + D.13335_259;
+  D.13337_261 = *D.13336_260;
+  avg_262 = D.13337_261 + avg_9;
+  col_single_263 = col_single_17 + 1;
+
+<bb 24>:
+  # avg_9 = PHI <avg_10(22), avg_262(23)>
+  # col_single_17 = PHI <col_single_253(22), col_single_263(23)>
+  D.13329_254 = col_start_42 + col_size_54;
+  D.13330_255 = D.13329_254 > col_single_17;
+  if (D.13330_255 != 0)
+    goto <bb 23>;
+  else
+    goto <bb 25>;
+
+<bb 25>:
+  row_single_264 = row_single_16 + 1;
+
+<bb 26>:
+  # avg_10 = PHI <avg_8(21), avg_9(25)>
+  # row_single_16 = PHI <row_single_248(21), row_single_264(25)>
+  D.13322_249 = row_start_39 + row_size_48;
+  D.13323_250 = D.13322_249 > row_single_16;
+  if (D.13323_250 != 0)
+    goto <bb 22>;
+  else
+    goto <bb 27>;
+
+<bb 27>:
+  D.13191_265 = r_1 * n_28(D);
+  D.13192_266 = D.13191_265 + c_2;
+  D.13193_267 = (long unsigned int) D.13192_266;
+  D.13194_268 = D.13193_267 * 4;
+  D.13338_270 = out_269(D) + D.13194_268;
+  D.13339_271 = (float) size_55;
+  D.13340_272 = avg_10 / D.13339_271;
+  *D.13338_270 = D.13340_272;
+  c_273 = c_2 + 1;
+
+<bb 28>:
+  # c_2 = PHI <c_25(3), c_273(27)>
+  D.13189_27 = c_2 < ce_26(D);
+  if (D.13189_27 != 0)
+    goto <bb 4>;
+  else
+    goto <bb 29>;
+
+<bb 29>:
+  r_274 = r_1 + 1;
+
+<bb 30>:
+  # r_1 = PHI <r_21(2), r_274(29)>
+  D.13184_23 = r_1 < re_22(D);
+  if (D.13184_23 != 0)
+    goto <bb 3>;
+  else
+    goto <bb 31>;
+
+<bb 31>:
+  return;
+
+}
+
+
+
+;; Function void fastest_blur(float*, int, float*, int*, int) (_Z12fastest_blurPfiS_Pii)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 3
+Number of blocks to update: 2 ( 67%)
+
+
+
+void fastest_blur(float*, int, float*, int*, int) (float * out, int n, float * frame, int * radii, int nthr)
+{
+  int load_size;
+  int num_tasks;
+  int D.13106;
+  int D.13105;
+  int D.13084;
+  struct .omp_data_s.0 .omp_data_o.4;
+
+<bb 2>:
+  omp_set_num_threads (nthr_1(D));
+  num_tasks_2 = 1000;
+  D.13084_4 = n_3(D) * n_3(D);
+  load_size_5 = D.13084_4 / num_tasks_2;
+  .omp_data_o.4.out = out_6(D);
+  .omp_data_o.4.frame = frame_7(D);
+  .omp_data_o.4.radii = radii_8(D);
+  .omp_data_o.4.n = n_3(D);
+  .omp_data_o.4.load_size = load_size_5;
+  __builtin_GOMP_parallel_start (_Z12fastest_blurPfiS_Pii._omp_fn.0, &.omp_data_o.4, 0);
+  _Z12fastest_blurPfiS_Pii._omp_fn.0 (&.omp_data_o.4);
+  __builtin_GOMP_parallel_end ();
+  out_9 = .omp_data_o.4.out;
+  frame_10 = .omp_data_o.4.frame;
+  radii_11 = .omp_data_o.4.radii;
+  n_12 = .omp_data_o.4.n;
+  load_size_13 = .omp_data_o.4.load_size;
+  D.13105_14 = n_12 / load_size_13;
+  D.13106_15 = D.13105_14 * load_size_13;
+  fastest_blur_block (out_9, 0, D.13106_15, n_12, n_12, n_12, frame_10, radii_11);
+  D.13105_16 = n_12 / load_size_13;
+  D.13106_17 = D.13105_16 * load_size_13;
+  D.13105_18 = n_12 / load_size_13;
+  D.13106_19 = D.13105_18 * load_size_13;
+  fastest_blur_block (out_9, D.13106_19, 0, n_12, D.13106_19, n_12, frame_10, radii_11);
+  return;
+
+}
+
+
+
+;; Function void simple_blur(float*, int, float*, int*) (_Z11simple_blurPfiS_Pi)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 15
+Number of blocks to update: 14 ( 93%)
+
+
+
+void simple_blur(float*, int, float*, int*) (float * out, int n, float * frame, int * radii)
+{
+  int c2;
+  int r2;
+  float avg;
+  int num;
+  int rd;
+  int c;
+  int r;
+  float D.13427;
+  float D.13426;
+  float * D.13425;
+  float D.13424;
+  float * D.13423;
+  long unsigned int D.13422;
+  long unsigned int D.13421;
+  int D.13420;
+  int D.13419;
+  const int D.13417;
+  const int & D.13416;
+  const int D.12909;
+  int D.13415;
+  const int D.12910;
+  bool retval.6;
+  const int & D.13410;
+  const int D.12907;
+  int D.13409;
+  const int D.12908;
+  const int D.13407;
+  const int & D.13406;
+  int D.13405;
+  const int D.12904;
+  int D.13404;
+  const int D.12905;
+  bool retval.5;
+  const int & D.13399;
+  const int D.12899;
+  int D.13398;
+  const int D.12900;
+  int * D.13397;
+  long unsigned int D.13396;
+  long unsigned int D.13395;
+  int D.13394;
+  int D.13393;
+  bool D.13391;
+  bool D.13386;
+
+<bb 2>:
+  r_9 = 0;
+  goto <bb 13>;
+
+<bb 3>:
+  c_12 = 0;
+  goto <bb 11>;
+
+<bb 4>:
+  D.13393_14 = r_1 * n_10(D);
+  D.13394_15 = D.13393_14 + c_2;
+  D.13395_16 = (long unsigned int) D.13394_15;
+  D.13396_17 = D.13395_16 * 4;
+  D.13397_19 = radii_18(D) + D.13396_17;
+  rd_20 = *D.13397_19;
+  num_21 = 0;
+  avg_22 = 0.0;
+  D.13398_23 = r_1 - rd_20;
+  D.12900 = D.13398_23;
+  D.12899 = 0;
+  D.13399_24 = std::max<int> (&D.12899, &D.12900);
+  r2_25 = *D.13399_24;
+  goto <bb 9>;
+
+<bb 5>:
+  D.13409_31 = c_2 - rd_20;
+  D.12908 = D.13409_31;
+  D.12907 = 0;
+  D.13410_32 = std::max<int> (&D.12907, &D.12908);
+  c2_33 = *D.13410_32;
+  goto <bb 7>;
+
+<bb 6>:
+  D.13419_39 = r2_7 * n_10(D);
+  D.13420_40 = D.13419_39 + c2_8;
+  D.13421_41 = (long unsigned int) D.13420_40;
+  D.13422_42 = D.13421_41 * 4;
+  D.13423_44 = frame_43(D) + D.13422_42;
+  D.13424_45 = *D.13423_44;
+  avg_46 = D.13424_45 + avg_5;
+  num_47 = num_3 + 1;
+  c2_48 = c2_8 + 1;
+
+<bb 7>:
+  # num_3 = PHI <num_4(5), num_47(6)>
+  # avg_5 = PHI <avg_6(5), avg_46(6)>
+  # c2_8 = PHI <c2_33(5), c2_48(6)>
+  D.13415_34 = c_2 + rd_20;
+  D.12910 = D.13415_34;
+  D.13405_35 = n_10(D) + -1;
+  D.12909 = D.13405_35;
+  D.13416_36 = std::min<int> (&D.12909, &D.12910);
+  D.13417_37 = *D.13416_36;
+  retval.6_38 = D.13417_37 >= c2_8;
+  if (retval.6_38 != 0)
+    goto <bb 6>;
+  else
+    goto <bb 8>;
+
+<bb 8>:
+  r2_49 = r2_7 + 1;
+
+<bb 9>:
+  # num_4 = PHI <num_21(4), num_3(8)>
+  # avg_6 = PHI <avg_22(4), avg_5(8)>
+  # r2_7 = PHI <r2_25(4), r2_49(8)>
+  D.13404_26 = r_1 + rd_20;
+  D.12905 = D.13404_26;
+  D.13405_27 = n_10(D) + -1;
+  D.12904 = D.13405_27;
+  D.13406_28 = std::min<int> (&D.12904, &D.12905);
+  D.13407_29 = *D.13406_28;
+  retval.5_30 = D.13407_29 >= r2_7;
+  if (retval.5_30 != 0)
+    goto <bb 5>;
+  else
+    goto <bb 10>;
+
+<bb 10>:
+  D.13393_50 = r_1 * n_10(D);
+  D.13394_51 = D.13393_50 + c_2;
+  D.13395_52 = (long unsigned int) D.13394_51;
+  D.13396_53 = D.13395_52 * 4;
+  D.13425_55 = out_54(D) + D.13396_53;
+  D.13426_56 = (float) num_4;
+  D.13427_57 = avg_6 / D.13426_56;
+  *D.13425_55 = D.13427_57;
+  c_58 = c_2 + 1;
+
+<bb 11>:
+  # c_2 = PHI <c_12(3), c_58(10)>
+  D.13391_13 = c_2 < n_10(D);
+  if (D.13391_13 != 0)
+    goto <bb 4>;
+  else
+    goto <bb 12>;
+
+<bb 12>:
+  r_59 = r_1 + 1;
+
+<bb 13>:
+  # r_1 = PHI <r_9(2), r_59(12)>
+  D.13386_11 = r_1 < n_10(D);
+  if (D.13386_11 != 0)
+    goto <bb 3>;
+  else
+    goto <bb 14>;
+
+<bb 14>:
+  return;
+
+}
+
+
+
+;; Function int main(int, char**) (main)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 28
+Number of blocks to update: 27 ( 96%)
+
+
+
+int main(int, char**) (int argc, char * * argv)
+{
+  float * D.13080;
+  float * D.13079;
+  float * D.13078;
+  int * D.13077;
+  float dif;
+  int j;
+  int i;
+  double time2;
+  float * out2;
+  int nthr;
+  int i;
+  int i;
+  double time;
+  float * out;
+  float * frame;
+  int * radii;
+  int n;
+  int D.13075;
+  double D.13062;
+  double D.13061;
+  int D.13060;
+  int * D.13059;
+  bool D.13056;
+  float D.13055;
+  float D.13054;
+  float * D.13053;
+  float D.13052;
+  float * D.13051;
+  long unsigned int D.13050;
+  long unsigned int D.13049;
+  int D.13048;
+  int D.13047;
+  bool D.13045;
+  bool D.13040;
+  double D.13036;
+  long unsigned int D.13035;
+  long unsigned int D.13034;
+  bool D.13032;
+  double D.13028;
+  long unsigned int D.13027;
+  long unsigned int D.13026;
+  float D.13025;
+  int D.13024;
+  int D.13023;
+  float * D.13022;
+  long unsigned int D.13021;
+  long unsigned int D.13020;
+  bool D.13018;
+  long unsigned int D.13014;
+  long unsigned int D.13013;
+  int D.13012;
+  int D.13011;
+  int D.13010;
+  int D.13009;
+  int D.13008;
+  int * D.13007;
+  long unsigned int D.13006;
+  long unsigned int D.13005;
+  bool D.13003;
+  long unsigned int D.12999;
+  long unsigned int D.12998;
+  int D.12997;
+
+<bb 2>:
+  srand (0);
+  n_6 = 3000;
+  D.12997_7 = n_6 * n_6;
+  D.12998_8 = (long unsigned int) D.12997_7;
+  D.12999_9 = D.12998_8 * 4;
+  D.13077_10 = operator new [] (D.12999_9);
+  radii_11 = D.13077_10;
+  i_12 = 0;
+  goto <bb 4>;
+
+<bb 3>:
+  D.13005_15 = (long unsigned int) i_1;
+  D.13006_16 = D.13005_15 * 4;
+  D.13007_17 = radii_11 + D.13006_16;
+  D.13008_18 = i_1 * 6;
+  D.12997_19 = n_6 * n_6;
+  D.13009_20 = D.13008_18 / D.12997_19;
+  D.13010_21 = rand ();
+  D.13011_22 = D.13010_21 % 6;
+  D.13012_23 = D.13009_20 + D.13011_22;
+  *D.13007_17 = D.13012_23;
+  i_24 = i_1 + 1;
+
+<bb 4>:
+  # i_1 = PHI <i_12(2), i_24(3)>
+  D.12997_13 = n_6 * n_6;
+  D.13003_14 = D.12997_13 > i_1;
+  if (D.13003_14 != 0)
+    goto <bb 3>;
+  else
+    goto <bb 5>;
+
+<bb 5>:
+  D.12997_25 = n_6 * n_6;
+  D.13013_26 = (long unsigned int) D.12997_25;
+  D.13014_27 = D.13013_26 * 4;
+  D.13078_28 = operator new [] (D.13014_27);
+  frame_29 = D.13078_28;
+  i_30 = 0;
+  goto <bb 7>;
+
+<bb 6>:
+  D.13020_33 = (long unsigned int) i_2;
+  D.13021_34 = D.13020_33 * 4;
+  D.13022_35 = frame_29 + D.13021_34;
+  D.13023_36 = rand ();
+  D.13024_37 = D.13023_36 % 256;
+  D.13025_38 = (float) D.13024_37;
+  *D.13022_35 = D.13025_38;
+  i_39 = i_2 + 1;
+
+<bb 7>:
+  # i_2 = PHI <i_30(5), i_39(6)>
+  D.12997_31 = n_6 * n_6;
+  D.13018_32 = D.12997_31 > i_2;
+  if (D.13018_32 != 0)
+    goto <bb 6>;
+  else
+    goto <bb 8>;
+
+<bb 8>:
+  D.12997_40 = n_6 * n_6;
+  D.13026_41 = (long unsigned int) D.12997_40;
+  D.13027_42 = D.13026_41 * 4;
+  D.13079_43 = operator new [] (D.13027_42);
+  out_44 = D.13079_43;
+  time_45 = timestamp ();
+  simple_blur (out_44, n_6, frame_29, radii_11);
+  D.13028_46 = timestamp ();
+  time_47 = D.13028_46 - time_45;
+  printf ("Time needed for naive blur = %.3f seconds.\n", time_47);
+  nthr_48 = 1;
+  goto <bb 20>;
+
+<bb 9>:
+  D.12997_50 = n_6 * n_6;
+  D.13034_51 = (long unsigned int) D.12997_50;
+  D.13035_52 = D.13034_51 * 4;
+  D.13080_53 = operator new [] (D.13035_52);
+  out2_54 = D.13080_53;
+  time2_55 = timestamp ();
+  fastest_blur (out2_54, n_6, frame_29, radii_11, nthr_3);
+  D.13036_56 = timestamp ();
+  time2_57 = D.13036_56 - time2_55;
+  i_58 = 0;
+  goto <bb 16>;
+
+<bb 10>:
+  j_60 = 0;
+  goto <bb 14>;
+
+<bb 11>:
+  D.13047_62 = i_4 * n_6;
+  D.13048_63 = D.13047_62 + j_5;
+  D.13049_64 = (long unsigned int) D.13048_63;
+  D.13050_65 = D.13049_64 * 4;
+  D.13051_66 = out_44 + D.13050_65;
+  D.13052_67 = *D.13051_66;
+  D.13047_68 = i_4 * n_6;
+  D.13048_69 = D.13047_68 + j_5;
+  D.13049_70 = (long unsigned int) D.13048_69;
+  D.13050_71 = D.13049_70 * 4;
+  D.13053_72 = out2_54 + D.13050_71;
+  D.13054_73 = *D.13053_72;
+  dif_74 = D.13052_67 - D.13054_73;
+  D.13055_75 = dif_74 * dif_74;
+  D.13056_76 = D.13055_75 > 1.0e+0;
+  if (D.13056_76 != 0)
+    goto <bb 12>;
+  else
+    goto <bb 13>;
+
+<bb 12>:
+  printf ("Your blur does not give the right result!\n");
+  D.13047_77 = i_4 * n_6;
+  D.13048_78 = D.13047_77 + j_5;
+  D.13049_79 = (long unsigned int) D.13048_78;
+  D.13050_80 = D.13049_79 * 4;
+  D.13059_81 = radii_11 + D.13050_80;
+  D.13060_82 = *D.13059_81;
+  printf ("For element (row, column, radii) = (%d, %d, %d):\n", i_4, j_5, D.13060_82);
+  D.13047_83 = i_4 * n_6;
+  D.13048_84 = D.13047_83 + j_5;
+  D.13049_85 = (long unsigned int) D.13048_84;
+  D.13050_86 = D.13049_85 * 4;
+  D.13051_87 = out_44 + D.13050_86;
+  D.13052_88 = *D.13051_87;
+  D.13061_89 = (double) D.13052_88;
+  printf ("  Simple blur gives %.2f\n", D.13061_89);
+  D.13047_90 = i_4 * n_6;
+  D.13048_91 = D.13047_90 + j_5;
+  D.13049_92 = (long unsigned int) D.13048_91;
+  D.13050_93 = D.13049_92 * 4;
+  D.13053_94 = out2_54 + D.13050_93;
+  D.13054_95 = *D.13053_94;
+  D.13062_96 = (double) D.13054_95;
+  printf ("  Your blur gives %.2f\n", D.13062_96);
+  exit (-1);
+
+<bb 13>:
+  j_97 = j_5 + 1;
+
+<bb 14>:
+  # j_5 = PHI <j_60(10), j_97(13)>
+  D.13045_61 = j_5 < n_6;
+  if (D.13045_61 != 0)
+    goto <bb 11>;
+  else
+    goto <bb 15>;
+
+<bb 15>:
+  i_98 = i_4 + 1;
+
+<bb 16>:
+  # i_4 = PHI <i_58(9), i_98(15)>
+  D.13040_59 = i_4 < n_6;
+  if (D.13040_59 != 0)
+    goto <bb 10>;
+  else
+    goto <bb 17>;
+
+<bb 17>:
+  if (out2_54 != 0B)
+    goto <bb 18>;
+  else
+    goto <bb 19>;
+
+<bb 18>:
+  operator delete [] (out2_54);
+
+<bb 19>:
+  printf ("Time needed for parallel blur with %d threads = %.3f seconds.\n", nthr_3, time2_57);
+  nthr_99 = nthr_3 + 1;
+
+<bb 20>:
+  # nthr_3 = PHI <nthr_48(8), nthr_99(19)>
+  D.13032_49 = nthr_3 <= 16;
+  if (D.13032_49 != 0)
+    goto <bb 9>;
+  else
+    goto <bb 21>;
+
+<bb 21>:
+  if (radii_11 != 0B)
+    goto <bb 22>;
+  else
+    goto <bb 23>;
+
+<bb 22>:
+  operator delete [] (radii_11);
+
+<bb 23>:
+  if (frame_29 != 0B)
+    goto <bb 24>;
+  else
+    goto <bb 25>;
+
+<bb 24>:
+  operator delete [] (frame_29);
+
+<bb 25>:
+  if (out_44 != 0B)
+    goto <bb 26>;
+  else
+    goto <bb 27>;
+
+<bb 26>:
+  operator delete [] (out_44);
+
+<bb 27>:
+  D.13075_100 = 0;
+  return D.13075_100;
+
+}
+
+
+
+;; Function <built-in> (_Z12fastest_blurPfiS_Pii._omp_fn.0)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 19
+Number of blocks to update: 14 ( 74%)
+
+
+
+<built-in> (struct .omp_data_s.0 * .omp_data_i)
+{
+  int * D.13588;
+  int * * D.13587;
+  float * * D.13586;
+  int * D.13585;
+  float * * D.13584;
+  struct .omp_data_s.2 .omp_data_o.3;
+  bool D.13582;
+  int D.13581;
+  int D.13580;
+  int D.13579;
+  int D.13578;
+  int D.13577;
+  int c;
+  bool D.13575;
+  int D.13574;
+  int D.13573;
+  int D.13572;
+  int D.13571;
+  int D.13570;
+  int D.13569;
+  int D.13568;
+  int r;
+  bool D.13566;
+
+<bb 18>:
+
+<bb 3>:
+
+<bb 4>:
+  D.13566_3 = __builtin_GOMP_single_start ();
+  if (D.13566_3 == 1)
+    goto <bb 5>;
+  else
+    goto <bb 13>;
+
+<bb 13>:
+  __builtin_GOMP_barrier ();
+
+<bb 14>:
+  return;
+
+<bb 5>:
+  r_4 = 0;
+
+<bb 12>:
+  # r_1 = PHI <r_4(5), r_23(11)>
+  D.13568_6 = .omp_data_i_5(D)->load_size;
+  D.13569_7 = r_1 * D.13568_6;
+  D.13570_8 = .omp_data_i_5(D)->load_size;
+  D.13571_9 = .omp_data_i_5(D)->n;
+  D.13572_10 = D.13571_9 / D.13570_8;
+  D.13573_11 = .omp_data_i_5(D)->load_size;
+  D.13574_12 = D.13572_10 * D.13573_11;
+  D.13575_13 = D.13569_7 < D.13574_12;
+  if (D.13575_13 != 0)
+    goto <bb 6>;
+  else
+    goto <bb 13>;
+
+<bb 6>:
+  c_14 = 0;
+
+<bb 10>:
+  # c_2 = PHI <c_14(6), c_29(9)>
+  D.13577_15 = .omp_data_i_5(D)->load_size;
+  D.13578_16 = c_2 * D.13577_15;
+  D.13579_17 = .omp_data_i_5(D)->load_size;
+  D.13580_18 = .omp_data_i_5(D)->n;
+  D.13572_19 = D.13580_18 / D.13579_17;
+  D.13581_20 = .omp_data_i_5(D)->load_size;
+  D.13574_21 = D.13572_19 * D.13581_20;
+  D.13582_22 = D.13578_16 < D.13574_21;
+  if (D.13582_22 != 0)
+    goto <bb 7>;
+  else
+    goto <bb 11>;
+
+<bb 11>:
+  r_23 = r_1 + 1;
+  goto <bb 12>;
+
+<bb 7>:
+  .omp_data_o.3.c = c_2;
+  .omp_data_o.3.r = r_1;
+  D.13584_24 = &.omp_data_i_5(D)->out;
+  .omp_data_o.3.out = D.13584_24;
+  D.13585_25 = &.omp_data_i_5(D)->n;
+  .omp_data_o.3.n = D.13585_25;
+  D.13586_26 = &.omp_data_i_5(D)->frame;
+  .omp_data_o.3.frame = D.13586_26;
+  D.13587_27 = &.omp_data_i_5(D)->radii;
+  .omp_data_o.3.radii = D.13587_27;
+  D.13588_28 = &.omp_data_i_5(D)->load_size;
+  .omp_data_o.3.load_size = D.13588_28;
+
+<bb 17>:
+  __builtin_GOMP_task (_Z12fastest_blurPfiS_Pii._omp_fn.1, &.omp_data_o.3, 0B, 48, 8, 1, 0);
+
+<bb 9>:
+  c_29 = c_2 + 1;
+  goto <bb 10>;
+
+}
+
+
+
+;; Function <built-in> (_Z12fastest_blurPfiS_Pii._omp_fn.1)
+
+
+
+Symbols to be put in SSA form
+
+{ .MEM }
+
+
+Incremental SSA update started at block: 0
+
+Number of blocks in CFG: 17
+Number of blocks to update: 3 ( 18%)
+
+
+
+<built-in> (struct .omp_data_s.2 * .omp_data_i)
+{
+  float * D.13560;
+  float * * D.13559;
+  int D.13558;
+  int * D.13557;
+  float * D.13556;
+  float * * D.13555;
+  int * D.13554;
+  int * * D.13553;
+  int D.13552;
+  int D.13551;
+  int * D.13550;
+  int D.13549;
+  int D.13548;
+  int * D.13547;
+  int D.13546;
+  int D.13545;
+  int * D.13544;
+  int D.13543;
+  int D.13542;
+  int D.13541;
+  int * D.13540;
+  int D.13539;
+  int r;
+  int c;
+
+<bb 16>:
+
+<bb 8>:
+  c_2 = .omp_data_i_1(D)->c;
+  r_3 = .omp_data_i_1(D)->r;
+  D.13539_4 = c_2 + 1;
+  D.13540_5 = .omp_data_i_1(D)->load_size;
+  D.13541_6 = *D.13540_5;
+  D.13542_7 = D.13539_4 * D.13541_6;
+  D.13543_8 = r_3 + 1;
+  D.13544_9 = .omp_data_i_1(D)->load_size;
+  D.13545_10 = *D.13544_9;
+  D.13546_11 = D.13543_8 * D.13545_10;
+  D.13547_12 = .omp_data_i_1(D)->load_size;
+  D.13548_13 = *D.13547_12;
+  D.13549_14 = c_2 * D.13548_13;
+  D.13550_15 = .omp_data_i_1(D)->load_size;
+  D.13551_16 = *D.13550_15;
+  D.13552_17 = r_3 * D.13551_16;
+  D.13553_18 = .omp_data_i_1(D)->radii;
+  D.13554_19 = *D.13553_18;
+  D.13555_20 = .omp_data_i_1(D)->frame;
+  D.13556_21 = *D.13555_20;
+  D.13557_22 = .omp_data_i_1(D)->n;
+  D.13558_23 = *D.13557_22;
+  D.13559_24 = .omp_data_i_1(D)->out;
+  D.13560_25 = *D.13559_24;
+  fastest_blur_block (D.13560_25, D.13552_17, D.13549_14, D.13546_11, D.13542_7, D.13558_23, D.13556_21, D.13554_19);
+  return;
+
+}
+
+
