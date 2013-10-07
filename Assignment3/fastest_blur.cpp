@@ -141,17 +141,8 @@ void fastest_blur(float* out, int n, float* frame, int* radii, int nthr){
 				}
 		}
 
-		for(int r=0; r<n; r++)
-			for(int c=(n/load_size)*load_size; c<n; c++)
-			{
-				fastest_blur_block(out, r, c, n, frame, radii);
-			}
-
-		for(int r=(n/load_size)*load_size; r<n; r++)
-			for(int c=0; c<(n/load_size)*load_size; c++)
-			{
-				fastest_blur_block(out, r, c, n, frame, radii);
-			}
+		fastest_blur_block(out, 0, (n/load_size)*load_size, n, n, n, frame, radii);
+		fastest_blur_block(out, (n/load_size)*load_size, 0, n, (n/load_size)*load_size, n, frame, radii);
 }
 
 int main(int argc, char *argv[])
