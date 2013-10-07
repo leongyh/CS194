@@ -33,7 +33,7 @@ void simple_blur(float* out, int n, float* frame, int* radii){
 		}
 }
 
-void parallel_blur_block(float* out, int r, int c, int n, float* frame, int* radii){
+void fastest_blur_block(float* out, int r, int c, int n, float* frame, int* radii){
 	__m128 v1,v2,v3,v4;
 	float* temp = new float[4];
 
@@ -121,24 +121,30 @@ void parallel_blur_block(float* out, int r, int c, int n, float* frame, int* rad
 	out[r*n+c] = avg/size;
 }
 
-void parallel_blur(float* out, int n, float* frame, int* radii, int nthr){
+void fastest_blur(float* out, int n, float* frame, int* radii, int nthr){
 	omp_set_num_threads(nthr);
+
+	int num_tasks = 1000;
+	int load_size = (n*n)/num_tasks;
 
 		#pragma omp parallel
 		{
-			int block = n / nthr;
-			int id = omp_get_thread_num();
-
-			#pragma omp task
-				for(int r=block*(id); r<block*(id+1); r++)
-					for(int c=0; c<n; c++)
-					{
-						parallel_blur_block(out, r, c, n, frame, radii);
-					}
+			for(int r=0; r*load_size<(n/load_size)*load_size; r++)
+				for(int c=0; c*load_size<(n/load_size)*load_size; c++)
+				{
+					#pragma omp task
+						fastest_blur_block(out, r, c, n, frame, radii);
+				}				
 		}
 
-		for(int r=(n/nthr)*nthr; r<n; r++)
-			for(int c=0; c<n; c++)
+		for(int r=0; r<n; r++)
+			for(int c=(n/load_size)*load_size; c<n; c++)
+			{
+				parallel_blur_block(out, r, c, n, frame, radii);
+			}
+
+		for(int r=(n/load_size)*load_size; r<n; r++)
+			for(int c=0; c<(n/load_size)*load_size; c++)
 			{
 				parallel_blur_block(out, r, c, n, frame, radii);
 			}
@@ -170,7 +176,7 @@ int main(int argc, char *argv[])
 	for(int nthr = 1; nthr <= 16; nthr++){
 		float* out2 = new float[n*n];
 		double time2 = timestamp();
-		parallel_blur(out2, n, frame, radii, nthr);
+		fastest_blur(out2, n, frame, radii, nthr);
 		time2 = timestamp() - time2;
 
 		//Check result
