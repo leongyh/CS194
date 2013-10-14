@@ -75,13 +75,13 @@ int main(int argc, char *argv[])
   size_t local_work_size[2] = {8,8};
   
   /* CS194: Set kernel arguments */
-  err = clSetKernelArg(incr, 0, sizeof(cl_mem), &g_Y);
+  err = clSetKernelArg(matmul, 0, sizeof(cl_mem), &g_Y);
   CHK_ERR(err);
-  err = clSetKernelArg(incr, 1, sizeof(cl_mem), &g_A);
+  err = clSetKernelArg(matmul, 1, sizeof(cl_mem), &g_A);
   CHK_ERR(err);
-  err = clSetKernelArg(incr, 2, sizeof(cl_mem), &g_B);
+  err = clSetKernelArg(matmul, 2, sizeof(cl_mem), &g_B);
   CHK_ERR(err);
-  err = clSetKernelArg(incr, 3, sizeof(int), &n);
+  err = clSetKernelArg(matmul, 3, sizeof(int), &n);
   CHK_ERR(err);
 
   double t0 = timestamp();

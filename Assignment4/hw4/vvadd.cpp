@@ -74,13 +74,13 @@ int main(int argc, char *argv[])
   size_t local_work_size[1] = {128};
   
   /* CS194: Set Kernel Arguments to array Y, A, B, and int n respectively*/
-  err = clSetKernelArg(incr, 0, sizeof(cl_mem), &g_Y);
+  err = clSetKernelArg(vvadd, 0, sizeof(cl_mem), &g_Y);
   CHK_ERR(err);
-  err = clSetKernelArg(incr, 1, sizeof(cl_mem), &g_A);
+  err = clSetKernelArg(vvadd, 1, sizeof(cl_mem), &g_A);
   CHK_ERR(err);
-  err = clSetKernelArg(incr, 2, sizeof(cl_mem), &g_B);
+  err = clSetKernelArg(vvadd, 2, sizeof(cl_mem), &g_B);
   CHK_ERR(err);
-  err = clSetKernelArg(incr, 3, sizeof(int), &n);
+  err = clSetKernelArg(vvadd, 3, sizeof(int), &n);
   CHK_ERR(err);
 
   /* CS194: Call kernel on the GPU */
