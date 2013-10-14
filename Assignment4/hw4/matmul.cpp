@@ -70,11 +70,11 @@ int main(int argc, char *argv[])
   err = clEnqueueWriteBuffer(cv.commands, g_B, true, 0, sizeof(float)*n*n, h_B, 0, NULL, NULL);
   CHK_ERR(err);
 
-  /* CS194: Create appropriately sized workgroups */
+  /* CS194: Create appropriately sized workgroups of dim 2*/
   size_t global_work_size[2] = {n,n};
   size_t local_work_size[2] = {8,8};
   
-  /* CS194: Set kernel arguments */
+  /* CS194: Set kernel arguments to array Y, A, B, and size n respectively*/
   err = clSetKernelArg(matmul, 0, sizeof(cl_mem), &g_Y);
   CHK_ERR(err);
   err = clSetKernelArg(matmul, 1, sizeof(cl_mem), &g_A);
@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
   double t0 = timestamp();
   /* CS194: Launch matrix multiply kernel
    * Here's a little code to get you started.. */
+  /*Executes kernel of dim 2 */
   err = clEnqueueNDRangeKernel(cv.commands, 
               matmul,
               2,
@@ -110,10 +111,12 @@ int main(int argc, char *argv[])
   err = clFinish(cv.commands);
   CHK_ERR(err);
 
+  //naive mm
   double t1 = timestamp();
   sqr_sgemm(h_YY, h_A, h_B, n);
   t1 = timestamp()-t1;
 
+  //check answer
   for(int i = 0; i < (n*n); i++)
     {
       double d = h_YY[i] - h_Y[i];
@@ -126,6 +129,7 @@ int main(int argc, char *argv[])
     }
   uninitialize_ocl(cv);
   
+  //delete host and GPU mem alloc
   delete [] h_A; 
   delete [] h_B; 
   delete [] h_Y;
