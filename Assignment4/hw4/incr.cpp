@@ -36,33 +36,40 @@ int main(int argc, char *argv[])
   /* Arrays on the device (GPU) */
   cl_mem g_Y;
 
+  /* Initialize array of size 2^20 on host */
   int n = (1<<20);
   h_Y = new float[n];
   h_YY = new float[n];
    
+  /*Assigns random double precision fp value*/
   for(int i = 0; i < n; i++)
     {
       h_YY[i] = h_Y[i] = (float)drand48();
     }
 
+  /* Variable to hold a function's return success or failure */
   cl_int err = CL_SUCCESS;
+
   /* CS194: Allocate memory for arrays on 
    * the GPU */
   g_Y = clCreateBuffer(cv.context,CL_MEM_READ_WRITE,sizeof(float)*n,NULL,&err);
   CHK_ERR(err);
 
-  err = clEnqueueWriteBuffer(cv.commands, g_Y, true, 0, sizeof(float)*n,
-			     h_Y, 0, NULL, NULL);
+  /* Writes to GPU array g_Y from h_Y in host. Checks for err status.*/
+  err = clEnqueueWriteBuffer(cv.commands, g_Y, true, 0, sizeof(float)*n, h_Y, 0, NULL, NULL);
   CHK_ERR(err);
 
+  /* Sets the local and global work size in bits. */
   size_t global_work_size[1] = {n};
   size_t local_work_size[1] = {128};
-    
+  
+  /* Sets the kernel's arguments to GPU's array and the size of the array. */
   err = clSetKernelArg(incr, 0, sizeof(cl_mem), &g_Y);
   CHK_ERR(err);
   err = clSetKernelArg(incr, 1, sizeof(int), &n);
   CHK_ERR(err);
  
+  /* Executes the incr kernel. */
   err = clEnqueueNDRangeKernel(cv.commands,
 			       incr,
 			       1,//work_dim,
@@ -97,11 +104,14 @@ int main(int argc, char *argv[])
       printf("CPU and GPU results match\n");
     }
 
+  /* Deletes OpenCL runtime*/
   uninitialize_ocl(cv);
   
+  /* Deletes host's array memory. */
   delete [] h_Y;
   delete [] h_YY;
 
+  /* Deletes GPU's array memory. */
   clReleaseMemObject(g_Y);
   
   return 0;

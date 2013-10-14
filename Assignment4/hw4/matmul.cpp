@@ -57,30 +57,55 @@ int main(int argc, char *argv[])
   g_Y = clCreateBuffer(cv.context,CL_MEM_READ_WRITE,
 		       sizeof(float)*n*n,NULL,&err);
   CHK_ERR(err);
+  g_A = clCreateBuffer(cv.context,CL_MEM_READ_WRITE,
+           sizeof(float)*n*n,NULL,&err);
+  CHK_ERR(err);
+  g_B = clCreateBuffer(cv.context,CL_MEM_READ_WRITE,
+           sizeof(float)*n*n,NULL,&err);
+  CHK_ERR(err);
   
   /* CS194: Copy data from host CPU to GPU */
+  err = clEnqueueWriteBuffer(cv.commands, g_A, true, 0, sizeof(float)*n*n, h_A, 0, NULL, NULL);
+  CHK_ERR(err);
+  err = clEnqueueWriteBuffer(cv.commands, g_B, true, 0, sizeof(float)*n*n, h_B, 0, NULL, NULL);
+  CHK_ERR(err);
 
   /* CS194: Create appropriately sized workgroups */
-  size_t global_work_size[2] = {-1,-1};
-  size_t local_work_size[2] = {-1,-1};
+  size_t global_work_size[2] = {n,n};
+  size_t local_work_size[2] = {8,8};
   
   /* CS194: Set kernel arguments */
+  err = clSetKernelArg(incr, 0, sizeof(cl_mem), &g_Y);
+  CHK_ERR(err);
+  err = clSetKernelArg(incr, 1, sizeof(cl_mem), &g_A);
+  CHK_ERR(err);
+  err = clSetKernelArg(incr, 2, sizeof(cl_mem), &g_B);
+  CHK_ERR(err);
+  err = clSetKernelArg(incr, 3, sizeof(int), &n);
+  CHK_ERR(err);
 
   double t0 = timestamp();
   /* CS194: Launch matrix multiply kernel
-   * Here's a little code to get you started.. 
-   err = clEnqueueNDRangeKernel(cv.commands,...
-			       );
-   CHK_ERR(err);
-   err = clFinish(cv.commands);
-   CHK_ERR(err);
-  */
+   * Here's a little code to get you started.. */
+  err = clEnqueueNDRangeKernel(cv.commands, 
+              matmul,
+              2,
+              NULL, //global_work_offset
+              global_work_size, //global_work_size
+              local_work_size, //local_work_size
+              0, //num_events_in_wait_list
+              NULL, //event_wait_list
+              NULL //
+              );
+  CHK_ERR(err);
+
+  err = clFinish(cv.commands);
+  CHK_ERR(err);
+  
   t0 = timestamp()-t0;
 
-
   /* Read result of GPU on host CPU */
-  err = clEnqueueReadBuffer(cv.commands, g_Y, true, 0, sizeof(float)*n*n,
-			    h_Y, 0, NULL, NULL);
+  err = clEnqueueReadBuffer(cv.commands, g_Y, true, 0, sizeof(float)*n*n, h_Y, 0, NULL, NULL);
   CHK_ERR(err);
   err = clFinish(cv.commands);
   CHK_ERR(err);
