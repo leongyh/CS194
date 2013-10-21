@@ -33,36 +33,26 @@ int main(int argc, char *argv[])
 
   int c;
   /* how long do you want your arrays? */
-  while((c = getopt(argc, argv, "n:"))!=-1){
-    switch(c){
-      case 'n':
-        n = atoi(optarg);
-        break;
+  while((c = getopt(argc, argv, "n:"))!=-1)
+    {
+      switch(c)
+	{
+	case 'n':
+	  n = atoi(optarg);
+	  break;
+	}
     }
-  }
-  
   if(n==0)
     return 0;
 
-  int padded_size = 1;
+  h_A = new int[n];
+  h_Y = new int[n];
 
-  while(padded_size < n){
-    padded_size << 1;
-  } 
-
-  h_A = new int[padded_size];
-  h_Y = new int[padded_size];
-
-  for(int i = 0; i < n; i++){
-    h_A[i] = 1;
-    h_Y[i] = 0;
-  }
-
-  for (int i = n; i < padded_size; ++i)
-  {
-    h_A[i] = 0;
-    h_Y[i] = 0;
-  }
+  for(int i = 0; i < n; i++)
+    {
+      h_A[i] = 1;
+      h_Y[i] = 0;
+    }
 
   cl_int err = CL_SUCCESS;
   g_Out = clCreateBuffer(cv.context,CL_MEM_READ_WRITE,
@@ -77,36 +67,21 @@ int main(int argc, char *argv[])
 			     h_Y, 0, NULL, NULL);
   CHK_ERR(err);
 
+
   err = clEnqueueWriteBuffer(cv.commands, g_In, true, 0, sizeof(int)*n,
 			     h_A, 0, NULL, NULL);
   CHK_ERR(err);
 
+
+
   size_t local_work_size[1] = {256};
   size_t global_work_size[1];
 
-  err = clSetKernelArg(reduce, 0, sizeof(int), &g_In);
-  CHK_ERR(err);
-  err = clSetKernelArg(reduce, 1, sizeof(int), &g_Out);
-  CHK_ERR(err);
-  err = clSetKernelArg(reduce, 2, sizeof(int)*256, NULL);
-  CHK_ERR(err);
-  err = clSetKernelArg(reduce, 3, sizeof(int), &padded_size);
-  CHK_ERR(err);
 
   double t0 = timestamp();
-  /* CS194 : Implement a reduction here */
-  err = clEnqueueNDRangeKernel(cv.commands,
-                  reduce,
-                  1,
-                  0,
-                  global_work_size,
-                  local_work_size,
-		              0,
-                  NULL,
-                  NULL
-                  );
-  CHK_ERR(err);
-
+  /* CS194 : Implement a 
+   * reduction here */
+  
   t0 = timestamp()-t0;
   
   //read result of GPU on host CPU
@@ -116,20 +91,20 @@ int main(int argc, char *argv[])
   
   int sum=0.0f;
   for(int i = 0; i < n; i++)
-  {
-    sum += h_A[i];
-  }
+    {
+      sum += h_A[i];
+    }
 
   if(sum!=h_Y[0])
-  {
-    printf("WRONG: CPU sum = %d, GPU sum = %d\n", sum, h_Y[0]);
-    printf("WRONG: difference = %d\n", sum-h_Y[0]);
-  }
+    {
+      printf("WRONG: CPU sum = %d, GPU sum = %d\n", sum, h_Y[0]);
+      printf("WRONG: difference = %d\n", sum-h_Y[0]);
+    }
   else
-  {
-    printf("CORRECT: %d,%g\n",n,t0);
-  }
-
+    {
+      printf("CORRECT: %d,%g\n",n,t0);
+    }
+ 
   uninitialize_ocl(cv);
   
   delete [] h_A; 
