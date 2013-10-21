@@ -7,7 +7,7 @@ __kernel void reduce(__global int *in, __global int *out, __local int *buf, int 
 
   int i = gid*(dim*2) + tid;
 
-  buf[tid] = (i < n) ? in[i] : 0
+  buf[tid] = (i < n) ? in[i] : 0;
 
   if(i + dim < n)
     buf[tid] += in[i + dim];

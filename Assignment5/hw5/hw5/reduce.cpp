@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
                   0,
                   global_work_size,
                   local_work_size,
+		  0,
                   NULL,
                   NULL
                   );
