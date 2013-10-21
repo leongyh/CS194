@@ -45,9 +45,9 @@ int main(int argc, char *argv[])
     return 0;
 
   int padded_size = 1;
-
+  
   while(padded_size < n){
-    padded_size << 1;
+    padded_size <<= 1;
   } 
 
   h_A = new int[padded_size];
@@ -80,33 +80,34 @@ int main(int argc, char *argv[])
   err = clEnqueueWriteBuffer(cv.commands, g_In, true, 0, sizeof(int)*n,
 			     h_A, 0, NULL, NULL);
   CHK_ERR(err);
+ 
+  size_t local_work_size[1] = {512};
+  size_t global_work_size[1] = {512};
 
-  size_t local_work_size[1] = {256};
-  size_t global_work_size[1];
-
-  err = clSetKernelArg(reduce, 0, sizeof(int), &g_In);
+  err = clSetKernelArg(reduce, 0, sizeof(cl_mem), &g_In);
   CHK_ERR(err);
-  err = clSetKernelArg(reduce, 1, sizeof(int), &g_Out);
+  err = clSetKernelArg(reduce, 1, sizeof(cl_mem), &g_Out);
   CHK_ERR(err);
-  err = clSetKernelArg(reduce, 2, sizeof(int)*256, NULL);
+  err = clSetKernelArg(reduce, 2, sizeof(int)*512, NULL);
   CHK_ERR(err);
   err = clSetKernelArg(reduce, 3, sizeof(int), &padded_size);
   CHK_ERR(err);
-
+  
   double t0 = timestamp();
   /* CS194 : Implement a reduction here */
+  for(int i = 0; i < 2; i++){
   err = clEnqueueNDRangeKernel(cv.commands,
                   reduce,
                   1,
                   0,
                   global_work_size,
                   local_work_size,
-		              0,
+                  0,
                   NULL,
                   NULL
                   );
   CHK_ERR(err);
-
+  }
   t0 = timestamp()-t0;
   
   //read result of GPU on host CPU
@@ -124,6 +125,12 @@ int main(int argc, char *argv[])
   {
     printf("WRONG: CPU sum = %d, GPU sum = %d\n", sum, h_Y[0]);
     printf("WRONG: difference = %d\n", sum-h_Y[0]);
+    printf("Other parts = %d, %d, %d, %d\n", h_Y[1], h_Y[2], h_Y[3], h_Y[4]);
+    int z=0;
+    while(h_Y[z] == h_Y[z+1]){
+	z++;
+    }
+    printf("red: %d\n", z);
   }
   else
   {

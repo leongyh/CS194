@@ -6,7 +6,7 @@ __kernel void reduce(__global int *in, __global int *out, __local int *buf, int 
   size_t idx = get_global_id(0);
 
   int acc = 0;
-  whike(idx < n){
+  while(idx < n){
     int elem = in[idx];
     acc += elem;
     idx += get_global_size(0);
