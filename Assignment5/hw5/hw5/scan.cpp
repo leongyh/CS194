@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
     kernel_map;
 
   int c;
-  int n = (1<<20);  
+  int n = 128;//(1<<20);  
   int *in, *out;
 
   int *cg_scan;

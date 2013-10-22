@@ -54,7 +54,7 @@ __kernel void scan(__global int *in,
 
       int temp = buf[a];
       buf[a] = buf[b];
-      buf[b] = t;
+      buf[b] = temp;
     }
   }
 
