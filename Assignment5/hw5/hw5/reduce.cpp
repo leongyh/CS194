@@ -29,17 +29,17 @@ void recursive_reduce(cl_command_queue &queue,
   
   left_over = global_work_size[0] / local_work_size[0];
 
-  err = clSetKernelArg(reduce, 0, sizeof(cl_mem), &in);
+  err = clSetKernelArg(reduce_kern, 0, sizeof(cl_mem), &in);
   CHK_ERR(err);
-  err = clSetKernelArg(reduce, 1, sizeof(cl_mem), &out);
+  err = clSetKernelArg(reduce_kern, 1, sizeof(cl_mem), &out);
   CHK_ERR(err);
-  err = clSetKernelArg(reduce, 2, sizeof(int)*local_work_size[0], NULL);
+  err = clSetKernelArg(reduce_kern, 2, sizeof(int)*local_work_size[0], NULL);
   CHK_ERR(err);
-  err = clSetKernelArg(reduce, 3, sizeof(int), &len);
+  err = clSetKernelArg(reduce_kern, 3, sizeof(int), &len);
   CHK_ERR(err);
 
-  err = clEnqueueNDRangeKernel(cv.commands,
-                  reduce,
+  err = clEnqueueNDRangeKernel(queue,
+                  reduce_kern,
                   1,
                   0,
                   global_work_size,
@@ -51,7 +51,7 @@ void recursive_reduce(cl_command_queue &queue,
   CHK_ERR(err);
 
   if(left_over > 1){
-    recursive_reduce(queue,context,reduce_kern,out,out,left_over)
+    recursive_reduce(queue,context,reduce_kern,out,out,left_over);
   }
 }
 
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
   //                 );
   // CHK_ERR(err);
   // }
-  recursive_reduce(cv.commands, reduce, g_In, g_Out, padded_size);
+  recursive_reduce(cv.commands, cv.context, reduce, g_In, g_Out, padded_size);
   t0 = timestamp()-t0;
   
   //read result of GPU on host CPU
