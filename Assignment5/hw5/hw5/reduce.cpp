@@ -14,12 +14,20 @@ void recursive_reduce(cl_command_queue &queue,
         cl_mem &out, 
         int len){
   /*
-
+    this recursion function calls the kernel multiple times. at each 
+    recursion, the total work size is shrinked by a factor
+    of the work size. at that recursion level, the total work size is that
+    shrinked  size. it does so until the local work size is equivalent
+    to the global work size and the first value of the output array is
+    the value of the reduced sum.
   */
 
+  //the maximum local work size is 512.
   size_t global_work_size[1] = {len};
   size_t local_work_size[1] = {512};
 
+  // set local work size to global work size if the global 
+  // size is lesser than 512
   if(len < 512){
     local_work_size[0] = len;
   }
@@ -27,6 +35,7 @@ void recursive_reduce(cl_command_queue &queue,
   int left_over = 0;
   cl_int err;
   
+  //determine the reduced global work size
   left_over = global_work_size[0] / local_work_size[0];
 
   err = clSetKernelArg(reduce_kern, 0, sizeof(cl_mem), &in);
@@ -38,6 +47,7 @@ void recursive_reduce(cl_command_queue &queue,
   err = clSetKernelArg(reduce_kern, 3, sizeof(int), &len);
   CHK_ERR(err);
 
+  // call kernel
   err = clEnqueueNDRangeKernel(queue,
                   reduce_kern,
                   1,
@@ -50,6 +60,7 @@ void recursive_reduce(cl_command_queue &queue,
                   );
   CHK_ERR(err);
 
+  // call recursion is still needs to be reduced
   if(left_over > 1){
     recursive_reduce(queue,context,reduce_kern,out,out,left_over);
   }
@@ -92,6 +103,7 @@ int main(int argc, char *argv[])
   if(n==0)
     return 0;
 
+  // pad the array is not power of 2
   int padded_size = 1;
   
   while(padded_size < n){
@@ -142,20 +154,8 @@ int main(int argc, char *argv[])
   CHK_ERR(err);
   
   double t0 = timestamp();
-  /* CS194 : Implement a reduction here */
-  // for(int i = 0; i < 2; i++){
-  // err = clEnqueueNDRangeKernel(cv.commands,
-  //                 reduce,
-  //                 1,
-  //                 0,
-  //                 global_work_size,
-  //                 local_work_size,
-  //                 0,
-  //                 NULL,
-  //                 NULL
-  //                 );
-  // CHK_ERR(err);
-  // }
+
+  // calls the recursion function
   recursive_reduce(cv.commands, cv.context, reduce, g_In, g_Out, padded_size);
   t0 = timestamp()-t0;
   

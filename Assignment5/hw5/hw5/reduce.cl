@@ -5,21 +5,11 @@ __kernel void reduce(__global int *in, __global int *out, __local int *buf, int 
   size_t dim = get_local_size(0);
   size_t idx = get_global_id(0);
 
-  /*
-  int acc = 0;
-  while(idx < n){
-    int elem = in[idx];
-    acc += elem;
-    idx += get_global_size(0);
-  }
-
-  buf[tid] = acc;
-  barrier(CLK_LOCAL_MEM_FENCE);
-  */
-
+  //pulls data into local memory chunk
   buf[tid] = in[idx];
   barrier(CLK_LOCAL_MEM_FENCE);
-  
+
+  // reduce chunk locally in that work item. this should avoid bank conflicts.
   for(int offset = dim/2; offset > 0; offset >>= 1){
     if(tid < offset){
       int other = buf[tid + offset];
@@ -29,31 +19,9 @@ __kernel void reduce(__global int *in, __global int *out, __local int *buf, int 
     barrier(CLK_LOCAL_MEM_FENCE);
   }
 
+  // puts the reduced sum of the chunkback into the output array in
+  // the index based on the work group ID.
   if(tid == 0){
     out[gid] = buf[0];
   }
-
-/*
-  int i = gid*(dim*2) + tid;
-
-  buf[tid] = (i < n) ? in[i] : 0;
-
-  if(i + dim < n)
-    buf[tid] += in[i + dim];
-
-  barrier(CLK_LOCAL_MEM_FENCE);
-
-  for (int i = dim/2; i > 0; i >>= 1)
-  {
-    if(tid < i)
-    {
-      buf[tid] += buf[tid + i];
-    }
-
-    barrier(CLK_LOCAL_MEM_FENCE);
-  }
-
-  if(tid == 0)
-    out[gid] = buf[0];
-  */
 }
