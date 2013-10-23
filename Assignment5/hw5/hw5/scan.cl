@@ -28,7 +28,7 @@ __kernel void scan(__global int *in,
   barrier(CLK_LOCAL_MEM_FENCE);
 
   int offset = 1;
-  for (int d = dim >> 1; i > 0; dim >>= 1)
+  for (int d = dim >> 1; d > 0; d >>= 1)
   {
     if(tid < d){
       buf[offset * (2 * tid + 2) - 1] += buf[offset * (2 * tid + 1) - 1];

@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
     kernel_map;
 
   int c;
-  int n = 128;//(1<<20);  
+  int n = (1<<20);  
   int *in, *out;
 
   int *cg_scan;
@@ -224,10 +224,11 @@ int main(int argc, char *argv[])
 	{
 	  printf("scan mismatch @ %d: cpu=%d, gpu=%d\n", 
 		 i, out[i], cg_scan[i]);
-	  break;
+	  return 1;
 	}
     }
   
+  printf("%s\n", "success");
 
   clReleaseMemObject(g_in); 
   clReleaseMemObject(g_scan);
