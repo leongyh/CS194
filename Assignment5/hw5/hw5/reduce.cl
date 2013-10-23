@@ -5,6 +5,7 @@ __kernel void reduce(__global int *in, __global int *out, __local int *buf, int 
   size_t dim = get_local_size(0);
   size_t idx = get_global_id(0);
 
+  /*
   int acc = 0;
   while(idx < n){
     int elem = in[idx];
@@ -14,6 +15,11 @@ __kernel void reduce(__global int *in, __global int *out, __local int *buf, int 
 
   buf[tid] = acc;
   barrier(CLK_LOCAL_MEM_FENCE);
+  */
+
+  buf[tid] = in[idx];
+  barrier(CLK_LOCAL_MEM_FENCE);
+  
   for(int offset = dim/2; offset > 0; offset >>= 1){
     if(tid < offset){
       int other = buf[tid + offset];

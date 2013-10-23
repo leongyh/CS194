@@ -7,6 +7,54 @@
 
 #include "clhelp.h"
 
+void recursive_reduce(cl_command_queue &queue,
+        cl_context &context,
+        cl_kernel &reduce_kern,
+        cl_mem &in, 
+        cl_mem &out, 
+        int len){
+  /*
+
+  */
+
+  size_t global_work_size[1] = {len};
+  size_t local_work_size[1] = {512};
+
+  if(len < 512){
+    local_work_size[0] = len;
+  }
+  
+  int left_over = 0;
+  cl_int err;
+  
+  left_over = global_work_size[0] / local_work_size[0];
+
+  err = clSetKernelArg(reduce, 0, sizeof(cl_mem), &in);
+  CHK_ERR(err);
+  err = clSetKernelArg(reduce, 1, sizeof(cl_mem), &out);
+  CHK_ERR(err);
+  err = clSetKernelArg(reduce, 2, sizeof(int)*local_work_size[0], NULL);
+  CHK_ERR(err);
+  err = clSetKernelArg(reduce, 3, sizeof(int), &len);
+  CHK_ERR(err);
+
+  err = clEnqueueNDRangeKernel(cv.commands,
+                  reduce,
+                  1,
+                  0,
+                  global_work_size,
+                  local_work_size,
+                  0,
+                  NULL,
+                  NULL
+                  );
+  CHK_ERR(err);
+
+  if(left_over > 1){
+    recursive_reduce(queue,context,reduce_kern,out,out,left_over)
+  }
+}
+
 int main(int argc, char *argv[])
 {
   std::string reduce_kernel_str;
@@ -82,7 +130,7 @@ int main(int argc, char *argv[])
   CHK_ERR(err);
  
   size_t local_work_size[1] = {512};
-  size_t global_work_size[1] = {512};
+  size_t global_work_size[1] = {padded_size};
 
   err = clSetKernelArg(reduce, 0, sizeof(cl_mem), &g_In);
   CHK_ERR(err);
@@ -95,19 +143,20 @@ int main(int argc, char *argv[])
   
   double t0 = timestamp();
   /* CS194 : Implement a reduction here */
-  for(int i = 0; i < 2; i++){
-  err = clEnqueueNDRangeKernel(cv.commands,
-                  reduce,
-                  1,
-                  0,
-                  global_work_size,
-                  local_work_size,
-                  0,
-                  NULL,
-                  NULL
-                  );
-  CHK_ERR(err);
-  }
+  // for(int i = 0; i < 2; i++){
+  // err = clEnqueueNDRangeKernel(cv.commands,
+  //                 reduce,
+  //                 1,
+  //                 0,
+  //                 global_work_size,
+  //                 local_work_size,
+  //                 0,
+  //                 NULL,
+  //                 NULL
+  //                 );
+  // CHK_ERR(err);
+  // }
+  recursive_reduce(cv.commands, reduce, g_In, g_Out, padded_size);
   t0 = timestamp()-t0;
   
   //read result of GPU on host CPU

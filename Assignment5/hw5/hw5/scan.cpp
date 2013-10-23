@@ -24,9 +24,14 @@ void recursive_scan(cl_command_queue &queue,
 		    cl_mem &out, 
 		    int len)
 {
-  /* CS194: Explain to us how
-   * this function works in a 
-   * short paragraph */
+  /* this is the upper-level recursion which calls the scan kernel
+   that does work on 128 sized blocks. the kernel does a scan on 
+   each individual block and uses the update kernel to update the blocks
+   by adding the sum of the previous block's final prefix sum in the
+   recursion. The update sum is always updated via recursion 
+   until the end of the recursion and added finally back to the 
+   output array.
+  */
   size_t global_work_size[1] = {len};
   size_t local_work_size[1] = {128};
   int left_over = 0;
@@ -56,7 +61,7 @@ void recursive_scan(cl_command_queue &queue,
   err = clSetKernelArg(scan_kern, 4, sizeof(int), &len);
   CHK_ERR(err);
 
-  /* CS194: You need to write this scan kernel */
+  /* explanation in the kernel file */
   err = clEnqueueNDRangeKernel(queue,
 			       scan_kern,
 			       1,//work_dim,
@@ -89,11 +94,13 @@ void recursive_scan(cl_command_queue &queue,
 			   sizeof(int), &len);
       CHK_ERR(err);
       
-      /* CS194: We've provided you with
-       * this update kernel. Make you
-       * sure youre explain includes
-       * how this kernel works and
-       * why its needed */
+      /* 
+      this update function is required as we are doing the scan
+      in chunks rather than as a whole. The last value of the chunk
+      will not be carried on to the next chunk. The update kernel
+      is called in recursion to update all the values that missed out on
+      the sum of the previous chunks' last values.
+      */
       err = clEnqueueNDRangeKernel(queue,
 				   update_kern,
 				   1,//work_dim,
