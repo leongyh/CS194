@@ -29,6 +29,8 @@ void rsort_reassemble(cl_command_queue &queue,
         cl_kernel &reassemble_kern,
         cl_mem &temp, 
         cl_mem &out,
+	cl_mem &zeroes,
+	cl_mem &ones,
         int len);
 
 void cpu_rscan(int *in, int *out, int v, int k, int n)
@@ -336,7 +338,7 @@ void rsort_scan(cl_command_queue &queue,
   clReleaseMemObject(g_bscan);
 }
 
-rsort_reassemble(cl_command_queue &queue,
+void rsort_reassemble(cl_command_queue &queue,
         cl_context &context,
         cl_kernel &reassemble_kern,
         cl_mem &temp, 
@@ -351,10 +353,6 @@ rsort_reassemble(cl_command_queue &queue,
 
   adjustWorkSize(global_work_size[0], local_work_size[0]);
   global_work_size[0] = std::max(local_work_size[0], global_work_size[0]);
-
-  cl_mem g_bscan = clCreateBuffer(context,CL_MEM_READ_WRITE, 
-          sizeof(int)*left_over,NULL,&err);
-  CHK_ERR(err);
 
   err = clSetKernelArg(reassemble_kern, 0, sizeof(cl_mem), &temp);
   CHK_ERR(err);

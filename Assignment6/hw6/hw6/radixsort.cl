@@ -116,5 +116,5 @@ __kernel void reassemble(__global int *temp, __global int *out, __global int *ze
   }else{
     offset = zeros[idx] - 1;
   }
-  out[offset] = in[idx];
+  out[offset] = temp[idx];
 }
