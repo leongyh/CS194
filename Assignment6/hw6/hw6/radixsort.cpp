@@ -19,9 +19,9 @@ void rsort_scan(cl_command_queue &queue,
     cl_kernel &scan_kern,
     cl_kernel &update_kern,
     cl_mem &in_zeroes,
-    cl_mem &in_ones 
+    cl_mem &in_ones, 
     cl_mem &zeroes,
-    cl_mem &ones 
+    cl_mem &ones, 
     int v,
     int k,
     int len);
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 
   for(int k = 0; k < 32; k++){
     //scan zeroes and ones
-    rsort_scan((cv.commands,
+    rsort_scan(cv.commands,
       cv.context,
       kernel_map[scan_name_str],
       kernel_map[update_name_str],
@@ -238,9 +238,9 @@ void rsort_scan(cl_command_queue &queue,
 		cl_kernel &scan_kern,
 		cl_kernel &update_kern,
 		cl_mem &in_zeroes,
-    cl_mem &in_ones 
+   		cl_mem &in_ones,
 		cl_mem &zeroes,
-    cl_mem &ones 
+	   	cl_mem &ones, 
 		int v,
 		int k,
 		int len)
@@ -355,10 +355,12 @@ void rsort_scan(cl_command_queue &queue,
 				   );
       CHK_ERR(err);
       
-      clReleaseMemObject(g_bbscan);
+      clReleaseMemObject(g_bbzeroes);
+      clReleaseMemObject(g_bbones);
     }
 
-  clReleaseMemObject(g_bscan);
+  clReleaseMemObject(g_bzeroes);
+  clReleaseMemObject(g_bones);
 }
 
 void rsort_reassemble(cl_command_queue &queue,

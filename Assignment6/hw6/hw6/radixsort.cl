@@ -1,7 +1,7 @@
 __kernel void update(__global int *in_zeroes,
-         __global int *in_ones
+	             __global int *in_ones,
 		     __global int *block_zeroes,
-         __global int *block_ones,
+        	     __global int *block_ones,
 		     int n)
 {
   size_t idx = get_global_id(0);
@@ -10,21 +10,21 @@ __kernel void update(__global int *in_zeroes,
   size_t gid = get_group_id(0);
 
   if(idx < n && gid > 0)
-    {
-      in_zeroes[idx] = in_zeroes[idx] + block_zeroes[gid-1];
-      in_ones[idx] = in_ones[idx] + block_ones[gid - 1];
-    }
+  {
+    in_zeroes[idx] = in_zeroes[idx] + block_zeroes[gid-1];
+    in_ones[idx] = in_ones[idx] + block_ones[gid - 1];
+  }
 }
 
 __kernel void scan(__global int *in_zeroes,
-       __global int *in_ones,
+  	           __global int *in_ones,
 		   __global int *zeroes,
-       __global int *ones, 
-		   __global int *bzeros,
-       __global int *bones,
+   	           __global int *ones, 
+		   __global int *bzeroes,
+   	           __global int *bones,
 		   /* dynamically sized local (private) memory */
 		   __local int *zeroes_buf,
-       __local int *ones_buf 
+       		   __local int *ones_buf,
 		   int v,
 		   int k,
 		   int n)
@@ -33,7 +33,7 @@ __kernel void scan(__global int *in_zeroes,
   size_t tid = get_local_id(0);
   size_t dim = get_local_size(0);
   size_t gid = get_group_id(0);
-  int t, r = 0, w = dim;
+  int z, o = 0;
 
   if(idx<n){
     z = in_zeroes[idx];
@@ -54,8 +54,6 @@ __kernel void scan(__global int *in_zeroes,
   
   barrier(CLK_LOCAL_MEM_FENCE);
 
-  /* CS194: Your scan code from HW 5 goes here */
-
   //the first sweep up reduction step
   int offset = 1;
   for (int d = dim >> 1; d > 0; d >>= 1)
@@ -71,7 +69,7 @@ __kernel void scan(__global int *in_zeroes,
   // at the last value in the local buffer to the other array for 
   //the update kernel so that this value can be added into the rest
   // of the values in the output array after this index.
-  bzeros[gid] = zeroes_buf[dim - 1];
+  bzeroes[gid] = zeroes_buf[dim - 1];
   bones[gid] = ones_buf[dim - 1];
 
   barrier(CLK_LOCAL_MEM_FENCE | CLK_GLOBAL_MEM_FENCE);
@@ -107,9 +105,11 @@ __kernel void scan(__global int *in_zeroes,
   // previously stored.
   if(idx < n){
     if(tid == dim - 1){
-      out[idx] = bout[gid];
+      zeroes[idx] = bzeroes[gid];
+      ones[idx] = bones[gid];
     }else{
-      out[idx] = buf[tid + 1];
+      zeroes[idx] = zeroes_buf[tid + 1];
+      ones[idx] = ones_buf[tid + 1];
     }
   }
 
