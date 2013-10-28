@@ -24,6 +24,13 @@ void rsort_scan(cl_command_queue &queue,
 		    int k,
 		    int len);
 
+void rsort_reassemble(cl_command_queue &queue,
+        cl_context &context,
+        cl_kernel &reassemble_kern,
+        cl_mem &temp, 
+        cl_mem &out,
+        int len);
+
 void cpu_rscan(int *in, int *out, int v, int k, int n)
 {
   int t = (in[0] >> k) & 0x1;
@@ -127,11 +134,9 @@ int main(int argc, char *argv[])
   err = clEnqueueWriteBuffer(cv.commands, g_out, true, 0, sizeof(int)*n,
 			     c_scan, 0, NULL, NULL);
   CHK_ERR(err);
-
   
   size_t global_work_size[1] = {n};
   size_t local_work_size[1] = {128};
-
 
   adjustWorkSize(global_work_size[0], local_work_size[0]);
   global_work_size[0] = std::max(local_work_size[0], global_work_size[0]);
@@ -139,7 +144,42 @@ int main(int argc, char *argv[])
 
   double t0 = timestamp();
   /* CS194: Implement radix sort here */
+  for(int k = 0; k < 32; k++){
+    //scan zeroes
+    rsort_scan(cv.commands,
+      cv.context,
+      kernel_map[scan_name_str],
+      kernel_map[update_name_str],
+      g_in, 
+      g_zeros, 
+      0,
+      k,
+      n);
 
+    //scan ones
+    rsort_scan(cv.commands,
+      cv.context,
+      kernel_map[scan_name_str],
+      kernel_map[update_name_str],
+      g_in, 
+      g_zeros, 
+      1,
+      k,
+      n);
+
+    rsort_reassemble(cv.commands,
+      cv.context,
+      kernel_map[reassemble_name_str],
+      g_in,
+      g_out,
+      g_zeros, 
+      g_ones,
+      n);
+
+    g_temp = g_in;
+    g_in = g_out;
+    g_out = g_temp;
+  }
   t0 = timestamp() - t0;
 
   /* Sort array on CPU for comparison */
@@ -293,8 +333,56 @@ void rsort_scan(cl_command_queue &queue,
       clReleaseMemObject(g_bbscan);
     }
 
-
-
   clReleaseMemObject(g_bscan);
+}
 
+rsort_reassemble(cl_command_queue &queue,
+        cl_context &context,
+        cl_kernel &reassemble_kern,
+        cl_mem &temp, 
+        cl_mem &out,
+        cl_mem &zeroes,
+        cl_mem &ones,
+        int len)
+{
+  size_t global_work_size[1] = {len};
+  size_t local_work_size[1] = {128};
+  cl_int err;
+
+  adjustWorkSize(global_work_size[0], local_work_size[0]);
+  global_work_size[0] = std::max(local_work_size[0], global_work_size[0]);
+
+  cl_mem g_bscan = clCreateBuffer(context,CL_MEM_READ_WRITE, 
+          sizeof(int)*left_over,NULL,&err);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(reassemble_kern, 0, sizeof(cl_mem), &temp);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(reassemble_kern, 1, sizeof(cl_mem), &out);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(reassemble_kern, 2, sizeof(cl_mem), &zeroes);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(reassemble_kern, 3, sizeof(cl_mem), &ones);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(reassemble_kern, 4, local_work_size[0]*sizeof(cl_int), NULL);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(reassemble_kern, 5, sizeof(int), &len);
+  CHK_ERR(err);
+
+  err = clEnqueueNDRangeKernel(queue,
+             reassemble_kern,
+             1,//work_dim,
+             NULL, //global_work_offset
+             global_work_size, //global_work_size
+             local_work_size, //local_work_size
+             0, //num_events_in_wait_list
+             NULL, //event_wait_list
+             NULL //
+             );
+  CHK_ERR(err);
 }
