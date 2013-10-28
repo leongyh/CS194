@@ -112,8 +112,8 @@ __kernel void reassemble(__global int *in, __global int *out, __global int *zero
     //zeros_buf[tid] = zeros[idx];
     //ones_buf[tid] = ones[idx];
   }
-
-  if(buf[tid]){
+  
+  if(temp_buf[tid]){
     offset = zeros[n - 1] + ones[idx] - 1;
   }else{
     offset = zeros[idx] - 1;

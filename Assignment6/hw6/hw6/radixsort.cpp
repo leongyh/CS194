@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
       kernel_map[scan_name_str],
       kernel_map[update_name_str],
       g_in, 
-      g_zeros, 
+      g_ones, 
       1,
       k,
       n);
@@ -201,6 +201,9 @@ int main(int argc, char *argv[])
 	{
 	  if(!silent)
 	    printf("not sorted @ %d: %d vs %d!\n", i, in[i], out[i]);
+ 	    
+	    for(int k = 0; k < 1000; k++)
+	    	printf("index %d | cpu: %d,  gpu %d\n", k, in[k], out[k]);
 	  goto done;
 	}
     }
