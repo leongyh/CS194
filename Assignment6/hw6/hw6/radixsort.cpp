@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 	    printf("not sorted @ %d: %d vs %d!\n", i, in[i], out[i]);
  	    
 	    for(int k = 0; k < 1000; k++)
-	    	printf("index %d | cpu: %d,  gpu %d\n", k, in[k], out[k]);
+//	    	printf("index %d | cpu: %d,  gpu %d\n", k, in[k], out[k]);
 	  goto done;
 	}
     }

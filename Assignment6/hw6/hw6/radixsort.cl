@@ -108,7 +108,7 @@ __kernel void reassemble(__global int *in, __global int *out, __global int *zero
 
   int offset;
   if (idx < n){
-    temp_buf[tid] = ((in[idx] << k) & 0x1);
+    temp_buf[tid] = ((in[idx] >> k) & 0x1);
     //zeros_buf[tid] = zeros[idx];
     //ones_buf[tid] = ones[idx];
   }
@@ -119,4 +119,5 @@ __kernel void reassemble(__global int *in, __global int *out, __global int *zero
     offset = zeros[idx] - 1;
   }
   out[offset] = in[idx];
+  barrier(CLK_GLOBAL_MEM_FENCE);
 }
