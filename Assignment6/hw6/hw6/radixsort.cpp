@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
   int left_over = 0;
 
   double t0 = timestamp();
-  /* CS194: Implement radix sort here */
+
   for(int k = 0; k < 32; k++){
     //scan zeroes
     rsort_scan(cv.commands,
@@ -217,6 +217,7 @@ int main(int argc, char *argv[])
  else
    {
      printf("GPU: array of length %d sorted in %g seconds\n", n, t0);
+
      printf("CPU: array of length %d sorted in %g seconds\n", n, t1);
    }
  done:
