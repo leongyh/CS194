@@ -27,10 +27,11 @@ void rsort_scan(cl_command_queue &queue,
 void rsort_reassemble(cl_command_queue &queue,
         cl_context &context,
         cl_kernel &reassemble_kern,
-        cl_mem &temp, 
+        cl_mem &in, 
         cl_mem &out,
-	cl_mem &zeroes,
-	cl_mem &ones,
+	      cl_mem &zeroes,
+        cl_mem &ones,
+        int k,
         int len);
 
 void cpu_rscan(int *in, int *out, int v, int k, int n)
@@ -176,6 +177,7 @@ int main(int argc, char *argv[])
       g_out,
       g_zeros, 
       g_ones,
+      k,
       n);
 
     g_temp = g_in;
@@ -341,10 +343,11 @@ void rsort_scan(cl_command_queue &queue,
 void rsort_reassemble(cl_command_queue &queue,
         cl_context &context,
         cl_kernel &reassemble_kern,
-        cl_mem &temp, 
+        cl_mem &in, 
         cl_mem &out,
         cl_mem &zeroes,
         cl_mem &ones,
+        int k,
         int len)
 {
   size_t global_work_size[1] = {len};
@@ -354,7 +357,7 @@ void rsort_reassemble(cl_command_queue &queue,
   adjustWorkSize(global_work_size[0], local_work_size[0]);
   global_work_size[0] = std::max(local_work_size[0], global_work_size[0]);
 
-  err = clSetKernelArg(reassemble_kern, 0, sizeof(cl_mem), &temp);
+  err = clSetKernelArg(reassemble_kern, 0, sizeof(cl_mem), &in);
   CHK_ERR(err);
 
   err = clSetKernelArg(reassemble_kern, 1, sizeof(cl_mem), &out);
@@ -369,7 +372,10 @@ void rsort_reassemble(cl_command_queue &queue,
   err = clSetKernelArg(reassemble_kern, 4, local_work_size[0]*sizeof(cl_int), NULL);
   CHK_ERR(err);
 
-  err = clSetKernelArg(reassemble_kern, 5, sizeof(int), &len);
+  err = clSetKernelArg(reassemble_kern, 5, sizeof(int), &k);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(reassemble_kern, 6, sizeof(int), &len);
   CHK_ERR(err);
 
   err = clEnqueueNDRangeKernel(queue,

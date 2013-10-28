@@ -92,13 +92,15 @@ __kernel void scan(__global int *in,
   /* CS194: one work-item stores the
    * work group's total partial
    * "reduction" */
+  /*
   if(tid==0)
     {
       bout[gid] = buf[r+dim-1];
     }
+  */
 }
 
-__kernel void reassemble(__global int *temp, __global int *out, __global int *zeros, __global int *ones, __local int *temp_buf,/* __local int *zeros_buf, __local int *ones_buf,*/ int n){
+__kernel void reassemble(__global int *in, __global int *out, __global int *zeros, __global int *ones, __local int *temp_buf,/* __local int *zeros_buf, __local int *ones_buf,*/ int k, int n){
   size_t idx = get_global_id(0);
   size_t tid = get_local_id(0);
   size_t dim = get_local_size(0);
@@ -106,7 +108,7 @@ __kernel void reassemble(__global int *temp, __global int *out, __global int *ze
 
   int offset;
   if (idx < n){
-    temp_buf[tid] = temp[idx];
+    temp_buf[tid] = ((in[idx] << k) & 0x1);
     //zeros_buf[tid] = zeros[idx];
     //ones_buf[tid] = ones[idx];
   }
@@ -116,5 +118,5 @@ __kernel void reassemble(__global int *temp, __global int *out, __global int *ze
   }else{
     offset = zeros[idx] - 1;
   }
-  out[offset] = temp[idx];
+  out[offset] = in[idx];
 }
