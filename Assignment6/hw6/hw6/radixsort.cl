@@ -1,5 +1,7 @@
-__kernel void update(__global int *in,
-		     __global int *block,
+__kernel void update(__global int *in_zeroes,
+         __global int *in_ones
+		     __global int *block_zeroes,
+         __global int *block_ones,
 		     int n)
 {
   size_t idx = get_global_id(0);
@@ -9,15 +11,20 @@ __kernel void update(__global int *in,
 
   if(idx < n && gid > 0)
     {
-      in[idx] = in[idx] + block[gid-1];
+      in_zeroes[idx] = in_zeroes[idx] + block_zeroes[gid-1];
+      in_ones[idx] = in_ones[idx] + block_ones[gid - 1];
     }
 }
 
-__kernel void scan(__global int *in, 
-		   __global int *out, 
-		   __global int *bout,
+__kernel void scan(__global int *in_zeroes,
+       __global int *in_ones,
+		   __global int *zeroes,
+       __global int *ones, 
+		   __global int *bzeros,
+       __global int *bones,
 		   /* dynamically sized local (private) memory */
-		   __local int *buf, 
+		   __local int *zeroes_buf,
+       __local int *ones_buf 
 		   int v,
 		   int k,
 		   int n)
@@ -29,15 +36,20 @@ __kernel void scan(__global int *in,
   int t, r = 0, w = dim;
 
   if(idx<n){
-    t = in[idx];
+    z = in_zeroes[idx];
+    o = in_ones[idx];
     /* CS194: v==-1 used to signify 
      * a "normal" additive scan
      * used to update the partial scans */
-    t = (v==-1) ? t : (v==((t>>k)&0x1)); 
-    buf[tid] = t;
+    z = (v==-1) ? z : (v==((z>>k)&0x1)); 
+    o = (v==-1) ? o : (v!=((o>>k)&0x1)); 
+
+    zeroes_buf[tid] = z;
+    ones_buf[tid] = o;
   }
   else{
-    buf[tid] = 0;
+    zeroes_buf[tid] = 0;
+    ones_buf[tid] = 0;
   }
   
   barrier(CLK_LOCAL_MEM_FENCE);
@@ -49,7 +61,8 @@ __kernel void scan(__global int *in,
   for (int d = dim >> 1; d > 0; d >>= 1)
   {
     if(tid < d){
-      buf[offset * (2 * tid + 2) - 1] += buf[offset * (2 * tid + 1) - 1];
+      zeroes_buf[offset * (2 * tid + 2) - 1] += zeroes_buf[offset * (2 * tid + 1) - 1];
+      ones_buf[offset * (2 * tid + 2) - 1] += ones_buf[offset * (2 * tid + 1) - 1];
     }
     offset <<= 1;
     barrier(CLK_LOCAL_MEM_FENCE);
@@ -58,12 +71,14 @@ __kernel void scan(__global int *in,
   // at the last value in the local buffer to the other array for 
   //the update kernel so that this value can be added into the rest
   // of the values in the output array after this index.
-  bout[gid] = buf[dim - 1];
+  bzeros[gid] = zeroes_buf[dim - 1];
+  bones[gid] = ones_buf[dim - 1];
 
   barrier(CLK_LOCAL_MEM_FENCE | CLK_GLOBAL_MEM_FENCE);
 
   // assigned last value in the calculated sweep up reduction step to 0
-  buf[dim - 1] = 0;
+  zeroes_buf[dim - 1] = 0;
+  ones_buf[dim - 1] = 0;
 
   // the final sweep down step
   for(int d = 1; d < dim; d <<= 1){
@@ -74,9 +89,14 @@ __kernel void scan(__global int *in,
       int a = offset * (2 * tid + 1) - 1;
       int b = offset * (2 * tid +  2) - 1;
 
-      int temp = buf[a];
-      buf[a] = buf[b];
-      buf[b] += temp;
+      int temp0 = zeroes_buf[a];
+      int temp1 = ones_buf[a];
+
+      zeroes_buf[a] = zeroes_buf[b];
+      ones_buf[a] = ones_buf[b];
+
+      zeroes_buf[b] += temp0;
+      ones_buf[b] += temp1;
     }
   }
 
@@ -111,7 +131,7 @@ __kernel void scan(__global int *in,
   */
 }
 
-__kernel void reassemble(__global int *in, __global int *out, __global int *zeros, __global int *ones, __local int *temp_buf,/* __local int *zeros_buf, __local int *ones_buf,*/ int k, int n){
+__kernel void reassemble(__global int *in, __global int *out, __global int *zeroes, __global int *ones, __local int *temp_buf,/* __local int *zeros_buf, __local int *ones_buf,*/ int k, int n){
   size_t idx = get_global_id(0);
   size_t tid = get_local_id(0);
   size_t dim = get_local_size(0);
@@ -120,14 +140,14 @@ __kernel void reassemble(__global int *in, __global int *out, __global int *zero
   int offset;
   if (idx < n){
     temp_buf[tid] = ((in[idx] >> k) & 0x1);
-    //zeros_buf[tid] = zeros[idx];
+    //zeroes_buf[tid] = zeroes[idx];
     //ones_buf[tid] = ones[idx];
   }
   
   if(temp_buf[tid]){
-    offset = zeros[n - 1] + ones[idx] - 1;
+    offset = zeroes[n - 1] + ones[idx] - 1;
   }else{
-    offset = zeros[idx] - 1;
+    offset = zeroes[idx] - 1;
   }
   out[offset] = in[idx];
   barrier(CLK_GLOBAL_MEM_FENCE);

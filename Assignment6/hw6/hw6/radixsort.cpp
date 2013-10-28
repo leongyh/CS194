@@ -15,14 +15,16 @@ int int_compar(const void *x, const void *y)
 }
 
 void rsort_scan(cl_command_queue &queue,
-		    cl_context &context,
-		    cl_kernel &scan_kern,
-		    cl_kernel &update_kern,
-		    cl_mem &in, 
-		    cl_mem &out, 
-		    int v,
-		    int k,
-		    int len);
+    cl_context &context,
+    cl_kernel &scan_kern,
+    cl_kernel &update_kern,
+    cl_mem &in_zeroes,
+    cl_mem &in_ones 
+    cl_mem &zeroes,
+    cl_mem &ones 
+    int v,
+    int k,
+    int len);
 
 void rsort_reassemble(cl_command_queue &queue,
         cl_context &context,
@@ -148,25 +150,16 @@ int main(int argc, char *argv[])
   double t0 = timestamp();
 
   for(int k = 0; k < 32; k++){
-    //scan zeroes
-    rsort_scan(cv.commands,
+    //scan zeroes and ones
+    rsort_scan((cv.commands,
       cv.context,
       kernel_map[scan_name_str],
       kernel_map[update_name_str],
       g_in, 
+      g_in,
       g_zeros, 
+      g_ones,
       0,
-      k,
-      n);
-
-    //scan ones
-    rsort_scan(cv.commands,
-      cv.context,
-      kernel_map[scan_name_str],
-      kernel_map[update_name_str],
-      g_in, 
-      g_ones, 
-      1,
       k,
       n);
 
@@ -244,8 +237,10 @@ void rsort_scan(cl_command_queue &queue,
 		cl_context &context,
 		cl_kernel &scan_kern,
 		cl_kernel &update_kern,
-		cl_mem &in, 
-		cl_mem &out, 
+		cl_mem &in_zeroes,
+    cl_mem &in_ones 
+		cl_mem &zeroes,
+    cl_mem &ones 
 		int v,
 		int k,
 		int len)
@@ -260,36 +255,48 @@ void rsort_scan(cl_command_queue &queue,
 
   left_over = global_work_size[0] / local_work_size[0];
   
-  cl_mem g_bscan = clCreateBuffer(context,CL_MEM_READ_WRITE, 
+  cl_mem g_bzeroes = clCreateBuffer(context,CL_MEM_READ_WRITE, 
 				  sizeof(int)*left_over,NULL,&err);
   CHK_ERR(err);
-
-  err = clSetKernelArg(scan_kern, 0, sizeof(cl_mem), &in);
+  cl_mem g_bones = clCreateBuffer(context,CL_MEM_READ_WRITE, 
+          sizeof(int)*left_over,NULL,&err);
   CHK_ERR(err);
 
-  err = clSetKernelArg(scan_kern, 1, sizeof(cl_mem), &out);
+  err = clSetKernelArg(scan_kern, 0, sizeof(cl_mem), &in_zeroes);
   CHK_ERR(err);
 
-  /* CS194: Per work-group partial scan output */
-  err = clSetKernelArg(scan_kern, 2, sizeof(cl_mem), &g_bscan);
+  err = clSetKernelArg(scan_kern, 1, sizeof(cl_mem), &in_ones);
   CHK_ERR(err);
 
-  /* CS194: number of bytes for dynamically 
-   * sized local (private memory) "buf"*/
-  err = clSetKernelArg(scan_kern, 3, 2*local_work_size[0]*sizeof(cl_int), NULL);
+  err = clSetKernelArg(scan_kern, 2, sizeof(cl_mem), &zeroes);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(scan_kern, 3, sizeof(cl_mem), &ones);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(scan_kern, 4, sizeof(cl_mem), &g_bzeroes);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(scan_kern, 5, sizeof(cl_mem), &g_bones);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(scan_kern, 6, 2*local_work_size[0]*sizeof(cl_int), NULL);
+  CHK_ERR(err);
+
+  err = clSetKernelArg(scan_kern, 7, 2*local_work_size[0]*sizeof(cl_int), NULL);
   CHK_ERR(err);
 
   /* CS194: v will be either 0 or 1 in order to perform
    * a scan of bits set (or unset) */
-  err = clSetKernelArg(scan_kern, 4, sizeof(int), &v);
+  err = clSetKernelArg(scan_kern, 8, sizeof(int), &v);
   CHK_ERR(err);
 
   /* CS194: the current bit position (0 to 31) that
    * we want to operate on */
-  err = clSetKernelArg(scan_kern, 5, sizeof(int), &k);
+  err = clSetKernelArg(scan_kern, 9, sizeof(int), &k);
   CHK_ERR(err);
 
-  err = clSetKernelArg(scan_kern, 6, sizeof(int), &len);
+  err = clSetKernelArg(scan_kern, 10, sizeof(int), &len);
   CHK_ERR(err);
 
   err = clEnqueueNDRangeKernel(queue,
@@ -306,22 +313,32 @@ void rsort_scan(cl_command_queue &queue,
 
   if(left_over > 1)
     {
-      cl_mem g_bbscan = clCreateBuffer(context,CL_MEM_READ_WRITE, 
+      cl_mem g_bbzeroes = clCreateBuffer(context,CL_MEM_READ_WRITE, 
 				      sizeof(int)*left_over,NULL,&err);
 
+       cl_mem g_bbones = clCreateBuffer(context,CL_MEM_READ_WRITE, 
+              sizeof(int)*left_over,NULL,&err);
+
       /* Recursively perform scan if needed */
-      rsort_scan(queue,context,scan_kern,update_kern,g_bscan,
-		     g_bbscan,-1,k,left_over);
+      rsort_scan(queue, context, scan_kern, update_kern, g_bzeroes, g_bones,
+		     g_bbzeroes, g_bbones, -1, k, left_over);
 
       err = clSetKernelArg(update_kern,0,
-			   sizeof(cl_mem), &out);
+			   sizeof(cl_mem), &zeroes);
+      CHK_ERR(err);
+      err = clSetKernelArg(update_kern,1,
+         sizeof(cl_mem), &ones);
       CHK_ERR(err);
       
-      err = clSetKernelArg(update_kern,1,
-			   sizeof(cl_mem), &g_bbscan);
+      err = clSetKernelArg(update_kern,2,
+			   sizeof(cl_mem), &g_bbzeroes);
       CHK_ERR(err);
 
-      err = clSetKernelArg(update_kern,2,
+      err = clSetKernelArg(update_kern,3,
+         sizeof(cl_mem), &g_bbones);
+      CHK_ERR(err);
+
+      err = clSetKernelArg(update_kern,4,
 			   sizeof(int), &len);
       CHK_ERR(err);
       
