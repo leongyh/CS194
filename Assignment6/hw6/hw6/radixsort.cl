@@ -82,13 +82,24 @@ __kernel void scan(__global int *in,
 
   barrier(CLK_LOCAL_MEM_FENCE);
 
-  
+  // put the values back into the output array from the local buffer with
+  // a one index shift. The last value the from the other array that was 
+  // previously stored.
+  if(idx < n){
+    if(tid == dim - 1){
+      out[idx] = bout[gid];
+    }else{
+      out[idx] = buf[tid + 1];
+    }
+  }
+
   /* CS194: Store partial scans */
+  /*
   if(idx < n)
     {
       out[idx] = buf[r+tid];
     }
-
+  */
   /* CS194: one work-item stores the
    * work group's total partial
    * "reduction" */
