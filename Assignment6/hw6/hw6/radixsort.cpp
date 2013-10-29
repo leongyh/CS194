@@ -148,7 +148,10 @@ int main(int argc, char *argv[])
 	int left_over = 0;
 
 	double t0 = timestamp();
-
+  /*
+  outer level loop that iterates through the bits.
+  call kernels on that specific k-th bit.
+  */
 	for(int k = 0; k < 32; k++){
 		//scan zeroes and ones
 		rsort_scan(cv.commands,
@@ -173,6 +176,8 @@ int main(int argc, char *argv[])
 			k,
 			n);
 
+    // reassigned pointers due to it not being an
+    // in-place sort
 		g_temp = g_in;
 		g_in = g_out;
 		g_out = g_temp;
@@ -194,9 +199,6 @@ int main(int argc, char *argv[])
 	{
 		if(!silent)
 			printf("not sorted @ %d: %d vs %d!\n", i, in[i], out[i]);
-			
-			for(int k = 0; k < 1000; k++)
-//        printf("index %d | cpu: %d,  gpu %d\n", k, in[k], out[k]);
 		goto done;
 	}
 		}
@@ -233,6 +235,12 @@ int main(int argc, char *argv[])
  * additive prefix scan combined
  * with the masking function needed
  * for radix sort */
+ /*
+ same recursive scan from homework 5 with the 
+ with the modification of handling both
+ zeros and ones scan simultaneously in the work
+ item to reduce overhead costs.
+ */
 void rsort_scan(cl_command_queue &queue,
 		cl_context &context,
 		cl_kernel &scan_kern,
@@ -363,6 +371,11 @@ void rsort_scan(cl_command_queue &queue,
 	clReleaseMemObject(g_bones);
 }
 
+/*
+enqueues the input and output arrays and the scanned
+ zeros and ones. outputs the sorted array by the
+ k-th bit
+*/
 void rsort_reassemble(cl_command_queue &queue,
 				cl_context &context,
 				cl_kernel &reassemble_kern,

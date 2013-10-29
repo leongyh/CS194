@@ -1,3 +1,8 @@
+/*
+ the update kernel is modified to handle both
+ zeros and ones in order to amortize overhead
+ costs.
+*/
 __kernel void update(__global int *in_zeroes,
 							 __global int *in_ones,
 							 __global int *block_zeroes,
@@ -16,6 +21,12 @@ __kernel void update(__global int *in_zeroes,
 	}
 }
 
+/*
+the scan kernel is modified to handle both the zeros
+and the ones in order to amortize overhead costs.
+The same scan kernel of the sweep up, sweep down
+technique is used from homework five.
+*/
 __kernel void scan(__global int *in_zeroes,
 							 __global int *in_ones,
 							 __global int *zeroes,
@@ -114,6 +125,12 @@ __kernel void scan(__global int *in_zeroes,
 	}
 }
 
+/*
+ The reassemble kernel is used to rearrange the k-th bit
+ based on the scanned zeros and ones. The zeros and ones
+ array are loaded into local buffer so that they don't
+ have to be globally retrieved. The speeds things up.
+*/
 __kernel void reassemble(__global int *in, 
 								__global int *out, 
 								__global int *zeroes, 
@@ -128,6 +145,7 @@ __kernel void reassemble(__global int *in,
 	size_t dim = get_local_size(0);
 	size_t gid = get_group_id(0);
 
+	// those to local buffer
 	int offset;
 	if (idx < n){
 		temp_buf[tid] = in[idx];
@@ -135,6 +153,7 @@ __kernel void reassemble(__global int *in,
 		ones_buf[tid] = ones[idx];
 	}
 	
+	// reassemble
 	if((temp_buf[tid] >> k) & 0x1){
 		offset = zeroes[n - 1] + ones_buf[tid] - 1;
 	}else{
