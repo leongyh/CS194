@@ -119,7 +119,7 @@ __kernel void reassemble(__global int *in,
 								__global int *zeroes, 
 								__global int *ones, 
 								__local int *temp_buf,
-								__local int *zeros_buf,
+								__local int *zeroes_buf,
 								__local int *ones_buf,
 								int k, 
 								int n){
