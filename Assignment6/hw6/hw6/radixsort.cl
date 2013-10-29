@@ -140,5 +140,5 @@ __kernel void reassemble(__global int *in,
 	}else{
 		offset = zeroes_buf[tid] - 1;
 	}
-	out[offset] = temp[tid];
+	out[offset] = temp_buf[tid];
 }

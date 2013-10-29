@@ -395,10 +395,16 @@ void rsort_reassemble(cl_command_queue &queue,
 	err = clSetKernelArg(reassemble_kern, 4, local_work_size[0]*sizeof(cl_int), NULL);
 	CHK_ERR(err);
 
-	err = clSetKernelArg(reassemble_kern, 5, sizeof(int), &k);
+	err = clSetKernelArg(reassemble_kern, 5, local_work_size[0]*sizeof(cl_int), NULL);
 	CHK_ERR(err);
 
-	err = clSetKernelArg(reassemble_kern, 6, sizeof(int), &len);
+	err = clSetKernelArg(reassemble_kern, 6, local_work_size[0]*sizeof(cl_int), NULL);
+	CHK_ERR(err);
+
+	err = clSetKernelArg(reassemble_kern, 7, sizeof(int), &k);
+	CHK_ERR(err);
+
+	err = clSetKernelArg(reassemble_kern, 8, sizeof(int), &len);
 	CHK_ERR(err);
 
 	err = clEnqueueNDRangeKernel(queue,
